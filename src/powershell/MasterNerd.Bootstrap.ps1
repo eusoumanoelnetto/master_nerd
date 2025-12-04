@@ -141,14 +141,85 @@ function Invoke-UsbFormatWizard {
     Write-Host "[>] Formatação guiada do pendrive" -ForegroundColor Yellow
     Ensure-Admin
 
-    $scriptPath = Join-Path $PSScriptRoot "usb-toolkit\Format-UsbDrive.ps1"
-    if (-not (Test-Path $scriptPath)) {
-        Write-Warning "Script de formatação não encontrado em: $scriptPath"
-        Write-Host "[!] Clone o repositório completo ou baixe Format-UsbDrive.ps1 manualmente." -ForegroundColor Yellow
+    $usbDisks = Get-Disk | Where-Object BusType -eq 'USB'
+    if (-not $usbDisks) {
+        Write-Warning "Nenhum pendrive USB detectado. Conecte o dispositivo e tente novamente."
         return
     }
 
-    & $scriptPath
+    Write-Host ""
+    Write-Host "[USB] Discos removíveis detectados:" -ForegroundColor Cyan
+    $usbDisks | ForEach-Object {
+        $sizeGB = [math]::Round($_.Size / 1GB, 2)
+        Write-Host ("  Disk {0} - {1}GB - {2} - Status: {3}" -f $_.Number, $sizeGB, $_.FriendlyName, $_.OperationalStatus)
+    }
+
+    Write-Host ""
+    Write-Host "==================== ATENÇÃO ====================" -ForegroundColor Red
+    Write-Host "A formatação apagará TODOS OS DADOS do pendrive." -ForegroundColor Yellow
+    Write-Host "Certifique-se de ter backup antes de continuar." -ForegroundColor Yellow
+    Write-Host "=================================================" -ForegroundColor Red
+    Write-Host ""
+
+    $diskNum = Read-Host "Digite o número do disco (ex: 1)"
+    $targetDisk = $usbDisks | Where-Object Number -eq $diskNum
+    if (-not $targetDisk) {
+        throw "Disco $diskNum não encontrado ou não é USB."
+    }
+
+    $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
+    if ($confirm1 -ne $diskNum) {
+        throw "Confirmação falhou. Operação cancelada."
+    }
+
+    $confirm2 = Read-Host "Digite 'FORMATAR' (em maiúsculas) para prosseguir"
+    if ($confirm2 -ne "FORMATAR") {
+        Write-Host "Operação cancelada pelo usuário." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host ""
+    Write-Host "Escolha o sistema de arquivos:" -ForegroundColor Cyan
+    Write-Host "  [1] exFAT (recomendado - compatível com Windows/Mac/Linux)"
+    Write-Host "  [2] NTFS (Windows nativo)"
+    Write-Host "  [3] FAT32 (máximo 4GB por arquivo)"
+    $fsChoice = Read-Host "Digite 1, 2 ou 3"
+
+    $fs = switch ($fsChoice) {
+        "1" { "exfat" }
+        "2" { "ntfs" }
+        "3" { "fat32" }
+        default { "exfat" }
+    }
+
+    Write-Host "[>] Iniciando formatação do Disk $diskNum como $fs..." -ForegroundColor Cyan
+
+    $diskpartScript = @"
+select disk $diskNum
+clean
+create partition primary
+format fs=$fs quick
+assign
+exit
+"@
+
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $diskpartScript | Set-Content -Path $tempFile -Encoding ASCII
+
+    try {
+        Write-Host "[>] Executando diskpart..." -ForegroundColor Yellow
+        $output = diskpart /s $tempFile 2>&1
+        $output | ForEach-Object { Write-Host $_ }
+        
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[OK] Formatação concluída com sucesso!" -ForegroundColor Green
+        } else {
+            throw "Diskpart retornou erro. Código: $LASTEXITCODE"
+        }
+    }
+    finally {
+        Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+    }
 }
 
 function Invoke-Menu {
