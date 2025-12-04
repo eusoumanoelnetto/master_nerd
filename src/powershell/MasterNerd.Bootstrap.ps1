@@ -307,6 +307,7 @@ exit
     # === PASSO 4: FORMAT ===
     $formatScript = @"
 select disk $diskNum
+select partition 1
 format fs=$fileSystem quick
 assign
 exit
