@@ -24,6 +24,8 @@ function Show-CrtBanner {
 | |\/| |/ _` / __| __/ _ \ '__| |  \| |/ _ \ '__/   | |
 | |  | | (_| \__ \ ||  __/ |    | |\  |  __/ | |  ()| |
 |_|  |_|\__,_|___/\__\___|_|    |_| \_|\___|_|  \___|_|
+
+                    By Manoel Coelho
 '@
     Write-Host $banner -ForegroundColor Green
 }
