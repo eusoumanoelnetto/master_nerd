@@ -92,6 +92,48 @@ function Start-StarWarsPlayback {
     Start-Sleep -Milliseconds 700
 }
 
+function Invoke-ExtrasMenu {
+    $extrasOptions = @(
+        @{ Key = '1'; Name = 'Download Windows'; Handler = { 
+            Write-Host "[>] Abrindo repositório de downloads do Windows..." -ForegroundColor Yellow
+            Write-Host ""
+            Start-Process "https://www.microsoft.com/software-download/windows"
+            Write-Host "[i] Browser aberto. Voltando ao menu em 3 segundos..." -ForegroundColor Green
+            Start-Sleep -Seconds 3
+        } },
+        @{ Key = '2'; Name = 'Download Office'; Handler = { 
+            Write-Host "[>] Abrindo repositório de downloads do Office..." -ForegroundColor Yellow
+            Write-Host ""
+            Start-Process "https://www.microsoft.com/microsoft-365/business/microsoft-office"
+            Write-Host "[i] Browser aberto. Voltando ao menu em 3 segundos..." -ForegroundColor Green
+            Start-Sleep -Seconds 3
+        } },
+        @{ Key = 'V'; Name = 'Voltar ao menu principal'; Handler = { return } }
+    )
+
+    $extrasActive = $true
+    while ($extrasActive) {
+        Write-Host ""
+        Write-Host "=== MENU EXTRAS ===" -ForegroundColor Green
+        foreach ($opt in $extrasOptions) {
+            Write-Host ("[{0}] {1}" -f $opt.Key,$opt.Name)
+        }
+        Write-Host ""
+
+        $choice = Read-Host "Selecione"
+        $selected = $extrasOptions | Where-Object Key -eq ($choice.ToUpper())
+        
+        if ($selected) {
+            & $selected.Handler
+            if ($selected.Key -eq 'V') { 
+                $extrasActive = $false 
+            }
+        } else {
+            Write-Host "[!] Opção inválida. Tente novamente." -ForegroundColor Yellow
+        }
+    }
+}
+
 function Test-IsAdmin {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal $identity
@@ -523,6 +565,7 @@ function Invoke-Menu {
             irm https://get.activated.win | iex
         } },
         @{ Key = '3'; Name = 'Rodar Star Wars: Episode IV - A NEW HOPE'; Handler = { Invoke-StarWars } },
+        @{ Key = '4'; Name = 'Extras'; Handler = { Invoke-ExtrasMenu } },
         @{ Key = 'Q'; Name = 'Sair'; Handler = { return } }
     )
 
