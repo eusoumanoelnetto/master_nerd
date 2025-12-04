@@ -392,7 +392,11 @@ function Invoke-Menu {
     )
     $options = @(
         @{ Key = '1'; Name = 'Formatar Pendrive'; Handler = { Invoke-UsbFormatWizard } },
-        @{ Key = '2'; Name = 'Microsoft-Activation-Scripts'; Handler = { Start-Process "https://github.com/massgravel/Microsoft-Activation-Scripts" } },
+        @{ Key = '2'; Name = 'Microsoft-Activation-Scripts'; Handler = { 
+            Write-Host "[>] Executando Microsoft-Activation-Scripts..." -ForegroundColor Yellow
+            Write-Host ""
+            irm https://get.activated.win | iex
+        } },
         @{ Key = '3'; Name = 'Criar Pendrive Bootavel'; Handler = { Invoke-UsbDryRun } },
         @{ Key = 'Q'; Name = 'Sair'; Handler = { return } }
     )
