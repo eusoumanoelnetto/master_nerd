@@ -95,11 +95,45 @@ function Start-StarWarsPlayback {
 function Invoke-ExtrasMenu {
     $extrasOptions = @(
         @{ Key = '1'; Name = 'Download Windows'; Handler = { 
-            Write-Host "[>] Abrindo repositório de downloads do Windows..." -ForegroundColor Yellow
             Write-Host ""
-            Start-Process "https://www.microsoft.com/software-download/windows"
-            Write-Host "[i] Browser aberto. Voltando ao menu em 3 segundos..." -ForegroundColor Green
-            Start-Sleep -Seconds 3
+            Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+            Write-Host "║ SELEÇÃO DE VERSÃO DO WINDOWS                   ║" -ForegroundColor Yellow
+            Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+            Write-Host ""
+            
+            $windowsVersions = @(
+                @{ Key = '1'; Name = 'Windows 11'; Url = 'https://www.microsoft.com/software-download/windows11' },
+                @{ Key = '2'; Name = 'Windows 10'; Url = 'https://www.microsoft.com/software-download/windows10' },
+                @{ Key = '3'; Name = 'Windows 10 / 11 Enterprise LTSC'; Url = 'https://www.microsoft.com/evalcenter/download-windows-10-enterprise' },
+                @{ Key = '4'; Name = 'Windows ARM64'; Url = 'https://www.microsoft.com/software-download/windows11arm64' },
+                @{ Key = '5'; Name = 'Windows 8.1'; Url = 'https://www.microsoft.com/software-download/windows8ISO' },
+                @{ Key = '6'; Name = 'Windows 8'; Url = 'https://www.microsoft.com/software-download/windows8ISO' },
+                @{ Key = '7'; Name = 'Windows 7'; Url = 'https://www.microsoft.com/software-download/windows7' },
+                @{ Key = '8'; Name = 'Windows Vista'; Url = 'https://www.microsoft.com/software-download/vista' },
+                @{ Key = '9'; Name = 'Windows XP'; Url = 'https://www.microsoft.com/software-download/windowsxp' },
+                @{ Key = '10'; Name = 'Windows Server'; Url = 'https://www.microsoft.com/evalcenter/evaluate-windows-server' },
+                @{ Key = '11'; Name = 'Windows Insider 10-11 - Server / Registration'; Url = 'https://insider.windows.com' },
+                @{ Key = 'V'; Name = 'Voltar'; Url = $null }
+            )
+
+            foreach ($version in $windowsVersions) {
+                Write-Host ("• {0}" -f $version.Name) -ForegroundColor Cyan
+            }
+            Write-Host ""
+
+            $winChoice = Read-Host "Selecione o número da versão"
+            $selectedVersion = $windowsVersions | Where-Object Key -eq $winChoice
+
+            if ($selectedVersion -and $selectedVersion.Url) {
+                Write-Host "[>] Abrindo $($selectedVersion.Name)..." -ForegroundColor Yellow
+                Start-Process $selectedVersion.Url
+                Write-Host "[i] Browser aberto. Voltando ao menu em 3 segundos..." -ForegroundColor Green
+                Start-Sleep -Seconds 3
+            } elseif ($winChoice -eq 'V') {
+                # Voltar sem fazer nada
+            } else {
+                Write-Host "[!] Opção inválida." -ForegroundColor Yellow
+            }
         } },
         @{ Key = '2'; Name = 'Download Office'; Handler = { 
             Write-Host "[>] Abrindo repositório de downloads do Office..." -ForegroundColor Yellow
