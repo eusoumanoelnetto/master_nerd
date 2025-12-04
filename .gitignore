@@ -1,0 +1,17 @@
+# Build artifacts
+artifacts/
+*.iso
+*.img
+
+# Logs/temp
+*.log
+*.tmp
+*.bak
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# OneDrive metadata
+*.lnk
+~$*
