@@ -138,34 +138,75 @@ function Invoke-UsbDryRun {
 }
 
 function Invoke-UsbFormatWizard {
-    Write-Host "[>] Abrindo CMD em modo administrador para formatação..." -ForegroundColor Yellow
-    
-    # Cria script batch temporário que será executado no CMD elevado
-    $batchContent = @'
-@echo off
-echo ========================================
-echo FORMATACAO DE PENDRIVE - DISKPART
-echo ========================================
-echo.
-diskpart
-echo.
-echo Formatacao concluida!
-echo Pressione qualquer tecla para voltar ao PowerShell...
-pause >nul
-'@
-    
-    $tempBatch = [System.IO.Path]::GetTempPath() + "masternerd_format.bat"
-    $batchContent | Set-Content -Path $tempBatch -Encoding ASCII
-    
+    Write-Host "[>] Formatação automática do pendrive (diskpart)" -ForegroundColor Yellow
+    Ensure-Admin
+
+    $usbDisks = Get-Disk | Where-Object BusType -eq 'USB'
+    if (-not $usbDisks) {
+        Write-Warning "Nenhum pendrive USB detectado. Conecte o dispositivo e tente novamente."
+        return
+    }
+
+    Write-Host ""
+    Write-Host "[USB] Discos removíveis detectados:" -ForegroundColor Cyan
+    $usbDisks | ForEach-Object {
+        $sizeGB = [math]::Round($_.Size / 1GB, 2)
+        Write-Host ("  Disk {0} - {1}GB - {2} - Status: {3}" -f $_.Number, $sizeGB, $_.FriendlyName, $_.OperationalStatus)
+    }
+
+    Write-Host ""
+    Write-Host "==================== ATENÇÃO ====================" -ForegroundColor Red
+    Write-Host "A formatação apagará TODOS OS DADOS do pendrive." -ForegroundColor Yellow
+    Write-Host "Certifique-se de ter backup antes de continuar." -ForegroundColor Yellow
+    Write-Host "================================================" -ForegroundColor Red
+    Write-Host ""
+
+    $diskNum = Read-Host "Digite o número do disco (ex: 1)"
+    $targetDisk = $usbDisks | Where-Object Number -eq $diskNum
+    if (-not $targetDisk) {
+        throw "Disco $diskNum não encontrado ou não é USB."
+    }
+
+    $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
+    if ($confirm1 -ne $diskNum) {
+        throw "Confirmação falhou. Operação cancelada."
+    }
+
+    $confirm2 = Read-Host "Digite 'FORMATAR' (em maiúsculas) para prosseguir"
+    if ($confirm2 -ne "FORMATAR") {
+        Write-Host "Operação cancelada pelo usuário." -ForegroundColor Yellow
+        return
+    }
+
+    Write-Host "[>] Preparando script diskpart (list disk -> select -> clean -> create -> format NTFS)..." -ForegroundColor Yellow
+
+    $diskpartScript = @"
+select disk $diskNum
+list disk
+clean
+create partition primary
+format fs=ntfs quick
+assign
+exit
+"@
+
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $diskpartScript | Set-Content -Path $tempFile -Encoding ASCII
+
     try {
-        # Executa CMD como admin e aguarda conclusão
-        Start-Process "cmd.exe" -ArgumentList "/k `"$tempBatch`"" -Verb RunAs -Wait
+        Write-Host "[>] Executando diskpart..." -ForegroundColor Yellow
+        $output = diskpart /s $tempFile 2>&1
+        $output | ForEach-Object { Write-Host $_ }
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[OK] Formatação concluída com sucesso!" -ForegroundColor Green
+        } else {
+            throw "Diskpart retornou erro. Código: $LASTEXITCODE"
+        }
     }
     finally {
-        Remove-Item $tempBatch -Force -ErrorAction SilentlyContinue
+        Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
     }
-    
-    Write-Host "[OK] Retornando ao menu principal..." -ForegroundColor Green
 }
 
 function Invoke-Menu {
