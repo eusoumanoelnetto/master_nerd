@@ -279,6 +279,14 @@ exit
         Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
     }
 
+    Start-Sleep -Milliseconds 800
+    $partition = Get-Partition -DiskNumber $diskNum -ErrorAction SilentlyContinue | Sort-Object PartitionNumber -Descending | Select-Object -First 1
+    if (-not $partition) {
+        throw "Nenhuma partição encontrada no disco $diskNum após criação."
+    }
+    $partitionNumber = $partition.PartitionNumber
+    Write-Host ("[>] Partição ativa detectada: #{0}" -f $partitionNumber) -ForegroundColor Yellow
+
     # === PASSO 3: SELECIONAR FILE SYSTEM ===
     Write-Host ""
     Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
@@ -307,7 +315,7 @@ exit
     # === PASSO 4: FORMAT ===
     $formatScript = @"
 select disk $diskNum
-select partition 1
+select partition $partitionNumber
 format fs=$fileSystem quick
 assign
 exit
