@@ -102,18 +102,18 @@ function Invoke-ExtrasMenu {
             Write-Host ""
             
             $windowsVersions = @(
-                @{ Key = '1'; Name = 'Windows 11'; Url = 'https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_pt-br.iso' },
-                @{ Key = '2'; Name = 'Windows 10'; Url = 'https://www.microsoft.com/software-download/windows10' },
-                @{ Key = '3'; Name = 'Windows 10 / 11 Enterprise LTSC'; Url = 'https://www.microsoft.com/evalcenter/download-windows-10-enterprise' },
-                @{ Key = '4'; Name = 'Windows ARM64'; Url = 'https://www.microsoft.com/software-download/windows11arm64' },
-                @{ Key = '5'; Name = 'Windows 8.1'; Url = 'https://www.microsoft.com/software-download/windows8ISO' },
-                @{ Key = '6'; Name = 'Windows 8'; Url = 'https://www.microsoft.com/software-download/windows8ISO' },
-                @{ Key = '7'; Name = 'Windows 7'; Url = 'https://www.microsoft.com/software-download/windows7' },
-                @{ Key = '8'; Name = 'Windows Vista'; Url = 'https://www.microsoft.com/software-download/vista' },
-                @{ Key = '9'; Name = 'Windows XP'; Url = 'https://www.microsoft.com/software-download/windowsxp' },
-                @{ Key = '10'; Name = 'Windows Server'; Url = 'https://www.microsoft.com/evalcenter/evaluate-windows-server' },
-                @{ Key = '11'; Name = 'Windows Insider 10-11 - Server / Registration'; Url = 'https://insider.windows.com' },
-                @{ Key = 'V'; Name = 'Voltar'; Url = $null }
+                @{ Key = '1'; Name = 'Windows 11'; Handler = { Invoke-WindowsDownload -Url 'https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_pt-br.iso' -Name 'Windows 11' } },
+                @{ Key = '2'; Name = 'Windows 10'; Handler = { Invoke-Windows10Menu } },
+                @{ Key = '3'; Name = 'Windows 10 / 11 Enterprise LTSC'; Handler = { Invoke-Windows10EnterpriseLtscMenu } },
+                @{ Key = '4'; Name = 'Windows ARM64'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/windows11arm64' -Name 'Windows ARM64' } },
+                @{ Key = '5'; Name = 'Windows 8.1'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/windows8ISO' -Name 'Windows 8.1' } },
+                @{ Key = '6'; Name = 'Windows 8'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/windows8ISO' -Name 'Windows 8' } },
+                @{ Key = '7'; Name = 'Windows 7'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/windows7' -Name 'Windows 7' } },
+                @{ Key = '8'; Name = 'Windows Vista'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/vista' -Name 'Windows Vista' } },
+                @{ Key = '9'; Name = 'Windows XP'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/software-download/windowsxp' -Name 'Windows XP' } },
+                @{ Key = '10'; Name = 'Windows Server'; Handler = { Invoke-WindowsDownload -Url 'https://www.microsoft.com/evalcenter/evaluate-windows-server' -Name 'Windows Server' } },
+                @{ Key = '11'; Name = 'Windows Insider 10-11 - Server / Registration'; Handler = { Invoke-WindowsDownload -Url 'https://insider.windows.com' -Name 'Windows Insider' } },
+                @{ Key = 'V'; Name = 'Voltar'; Handler = { return } }
             )
 
             foreach ($version in $windowsVersions) {
@@ -124,13 +124,8 @@ function Invoke-ExtrasMenu {
             $winChoice = Read-Host "Selecione o número da versão"
             $selectedVersion = $windowsVersions | Where-Object Key -eq $winChoice
 
-            if ($selectedVersion -and $selectedVersion.Url) {
-                Write-Host "[>] Abrindo $($selectedVersion.Name)..." -ForegroundColor Yellow
-                Start-Process $selectedVersion.Url
-                Write-Host "[i] Browser aberto. Voltando ao menu em 3 segundos..." -ForegroundColor Green
-                Start-Sleep -Seconds 3
-            } elseif ($winChoice -eq 'V') {
-                # Voltar sem fazer nada
+            if ($selectedVersion) {
+                & $selectedVersion.Handler
             } else {
                 Write-Host "[!] Opção inválida." -ForegroundColor Yellow
             }
@@ -165,6 +160,120 @@ function Invoke-ExtrasMenu {
         } else {
             Write-Host "[!] Opção inválida. Tente novamente." -ForegroundColor Yellow
         }
+    }
+}
+
+function Invoke-WindowsDownload {
+    param(
+        [string]$Url,
+        [string]$Name
+    )
+    Write-Host "[>] Iniciando download de $Name..." -ForegroundColor Yellow
+    Start-Process $Url
+    Write-Host "[i] Download iniciado. Voltando ao menu em 3 segundos..." -ForegroundColor Green
+    Start-Sleep -Seconds 3
+}
+
+function Invoke-Windows10Menu {
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ WINDOWS 10 - SELEÇÃO DE ARQUITETURA            ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $archs = @(
+        @{ Key = '1'; Name = 'x64'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_consumer_editions_version_22h2_updated_oct_2025_x64_dvd_38efd00d.iso' },
+        @{ Key = '2'; Name = 'x86'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_consumer_editions_version_22h2_updated_oct_2025_x86_dvd_38efd00d.iso' },
+        @{ Key = 'V'; Name = 'Voltar'; Url = $null }
+    )
+    
+    foreach ($arch in $archs) {
+        Write-Host ("[{0}] {1}" -f $arch.Key, $arch.Name) -ForegroundColor Cyan
+    }
+    Write-Host ""
+    
+    $choice = Read-Host "Selecione"
+    $selected = $archs | Where-Object Key -eq $choice
+    
+    if ($selected -and $selected.Url) {
+        Invoke-WindowsDownload -Url $selected.Url -Name "Windows 10 $($selected.Name)"
+    }
+}
+
+function Invoke-Windows10EnterpriseLtscMenu {
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ WINDOWS ENTERPRISE LTSC - SELEÇÃO DE VERSÃO    ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $versions = @(
+        @{ Key = '1'; Name = 'Windows 10 Enterprise LTSC'; Handler = { Invoke-Windows10EnterpriseLtscArchMenu } },
+        @{ Key = '2'; Name = 'Windows 11 Enterprise LTSC'; Handler = { Invoke-Windows11EnterpriseLtscArchMenu } },
+        @{ Key = 'V'; Name = 'Voltar'; Handler = { return } }
+    )
+    
+    foreach ($version in $versions) {
+        Write-Host ("[{0}] {1}" -f $version.Key, $version.Name) -ForegroundColor Cyan
+    }
+    Write-Host ""
+    
+    $choice = Read-Host "Selecione"
+    $selected = $versions | Where-Object Key -eq $choice
+    
+    if ($selected) {
+        & $selected.Handler
+    }
+}
+
+function Invoke-Windows10EnterpriseLtscArchMenu {
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ WINDOWS 10 LTSC - SELEÇÃO DE ARQUITETURA       ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $archs = @(
+        @{ Key = '1'; Name = 'x64'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_enterprise_ltsc_2021_x64_dvd_f318268e.iso' },
+        @{ Key = '2'; Name = 'x86'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_enterprise_ltsc_2021_x86_dvd_d4aea182.iso' },
+        @{ Key = 'V'; Name = 'Voltar'; Url = $null }
+    )
+    
+    foreach ($arch in $archs) {
+        Write-Host ("[{0}] {1}" -f $arch.Key, $arch.Name) -ForegroundColor Cyan
+    }
+    Write-Host ""
+    
+    $choice = Read-Host "Selecione"
+    $selected = $archs | Where-Object Key -eq $choice
+    
+    if ($selected -and $selected.Url) {
+        Invoke-WindowsDownload -Url $selected.Url -Name "Windows 10 Enterprise LTSC $($selected.Name)"
+    }
+}
+
+function Invoke-Windows11EnterpriseLtscArchMenu {
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ WINDOWS 11 LTSC - SELEÇÃO DE ARQUITETURA       ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+    
+    $archs = @(
+        @{ Key = '1'; Name = 'x64'; Url = 'https://www.microsoft.com/evalcenter/download-windows-11-enterprise' },
+        @{ Key = 'V'; Name = 'Voltar'; Url = $null }
+    )
+    
+    foreach ($arch in $archs) {
+        Write-Host ("[{0}] {1}" -f $arch.Key, $arch.Name) -ForegroundColor Cyan
+    }
+    Write-Host ""
+    
+    $choice = Read-Host "Selecione"
+    $selected = $archs | Where-Object Key -eq $choice
+    
+    if ($selected -and $selected.Url) {
+        Invoke-WindowsDownload -Url $selected.Url -Name "Windows 11 Enterprise LTSC $($selected.Name)"
     }
 }
 
