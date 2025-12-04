@@ -69,6 +69,29 @@ function Show-ProgressBar {
     Write-Host "`r$bar $percentText $Status" -NoNewline -ForegroundColor Green
 }
 
+function Start-StarWarsPlayback {
+    Write-Host ""
+    Write-Host "[CONTROLES]" -ForegroundColor Cyan
+    Write-Host "  CTRL + ]  -> Abre o prompt interno do Telnet" -ForegroundColor DarkYellow
+    Write-Host "  quit + ENTER -> Encerra o filme e retorna ao menu" -ForegroundColor DarkYellow
+    Write-Host "  CTRL + C  -> Cancela imediatamente" -ForegroundColor DarkYellow
+    Write-Host "  Fechar a janela também encerra a sessão" -ForegroundColor DarkYellow
+    Write-Host ""
+
+    $startChoice = Read-Host "Pressione ENTER para assistir ou digite C para cancelar"
+    if ($startChoice -match '^[cC]$') {
+        throw [System.OperationCanceledException]::new("Projeção Star Wars cancelada pelo usuário.")
+    }
+
+    Write-Host ""
+    Write-Host "[>] Conectando a towel.blinkenlights.nl..." -ForegroundColor Cyan
+    Start-Sleep -Milliseconds 500
+    telnet towel.blinkenlights.nl
+    Write-Host ""
+    Write-Host "[i] Sessão Star Wars encerrada. May the Force be with you." -ForegroundColor Green
+    Start-Sleep -Milliseconds 700
+}
+
 function Test-IsAdmin {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal $identity
@@ -154,12 +177,11 @@ function Invoke-StarWars {
 
     if ($telnetStatus.State -eq 'Enabled') {
         Write-Host "[OK] Telnet Client já está ativado!" -ForegroundColor Green
-        Write-Host ""
-        Write-Host "[>] Conectando a towel.blinkenlights.nl..." -ForegroundColor Cyan
-        Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
-        Write-Host ""
-        Start-Sleep -Milliseconds 800
-        telnet towel.blinkenlights.nl
+        try {
+            Start-StarWarsPlayback
+        } catch [System.OperationCanceledException] {
+            Write-Host "[i] Projeção cancelada. Voltando ao menu..." -ForegroundColor Yellow
+        }
         return
     }
 
@@ -195,13 +217,11 @@ function Invoke-StarWars {
                 } elseif ($restartChoice -eq '2') {
                     Write-Host ""
                     Write-Host "[!] O Telnet Client será ativado após o próximo restart." -ForegroundColor Yellow
-                    Write-Host "[>] Tentando conectar mesmo assim..." -ForegroundColor Cyan
-                    Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
-                    Write-Host ""
-                    Start-Sleep -Milliseconds 800
-                    
+
                     try {
-                        telnet towel.blinkenlights.nl
+                        Start-StarWarsPlayback
+                    } catch [System.OperationCanceledException] {
+                        Write-Host "[i] Projeção cancelada. Reinicie quando quiser assistir." -ForegroundColor Yellow
                     } catch {
                         Write-Host ""
                         Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Red
@@ -220,11 +240,11 @@ function Invoke-StarWars {
             } else {
                 Write-Host "[OK] Telnet Client ativado com sucesso (sem restart necessário)!" -ForegroundColor Green
                 Write-Host ""
-                Write-Host "[>] Conectando a towel.blinkenlights.nl..." -ForegroundColor Cyan
-                Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
-                Write-Host ""
-                Start-Sleep -Milliseconds 800
-                telnet towel.blinkenlights.nl
+                try {
+                    Start-StarWarsPlayback
+                } catch [System.OperationCanceledException] {
+                    Write-Host "[i] Projeção cancelada. Voltando ao menu..." -ForegroundColor Yellow
+                }
             }
         } catch {
             Write-Host ""
