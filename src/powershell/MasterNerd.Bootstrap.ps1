@@ -141,17 +141,14 @@ function Invoke-UsbFormatWizard {
     Write-Host "[>] Formatação guiada do pendrive" -ForegroundColor Yellow
     Ensure-Admin
 
-    $disks = Get-Disk | Where-Object BusType -eq 'USB'
-    if (-not $disks) {
-        Write-Warning "Nenhum disco USB detectado. Plugue o dispositivo alvo e tente novamente."
+    $scriptPath = Join-Path $PSScriptRoot "usb-toolkit\Format-UsbDrive.ps1"
+    if (-not (Test-Path $scriptPath)) {
+        Write-Warning "Script de formatação não encontrado em: $scriptPath"
+        Write-Host "[!] Clone o repositório completo ou baixe Format-UsbDrive.ps1 manualmente." -ForegroundColor Yellow
         return
     }
 
-    foreach ($disk in $disks) {
-        Write-Host ("[USB] #{0} {1}GB - Status:{2}" -f $disk.Number,[math]::Round($disk.Size/1GB,2),$disk.OperationalStatus)
-    }
-
-    Write-Host "[!] A formatação destrutiva ainda não está habilitada. Ajuste scripts em src/powershell/usb-toolkit para completar o pipeline." -ForegroundColor DarkYellow
+    & $scriptPath
 }
 
 function Invoke-Menu {
