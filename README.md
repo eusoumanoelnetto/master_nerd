@@ -18,7 +18,7 @@ Terminal nerd-cyberpunk com scripts PowerShell portáteis para automação de Wi
 1. Copie e cole o comando abaixo e pressione Enter:
 
 ```powershell
-irm https://get.masternerd.win | iex
+irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/get.ps1 | iex
 ```
 
 1. Pronto! O menu CRT aparecerá com as opções disponíveis.
