@@ -18,13 +18,13 @@ Terminal nerd-cyberpunk com scripts PowerShell portáteis para automação de Wi
 1. Copie e cole o comando abaixo e pressione Enter:
 
 ```powershell
-irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/main/src/powershell/MasterNerd.Bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 | iex
 ```
 
 Alternativa legada (caso `irm` esteja bloqueado):
 
 ```powershell
-iwr https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/main/src/powershell/MasterNerd.Bootstrap.ps1 -UseBasicParsing | iex
+iwr https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 -UseBasicParsing | iex
 ```
 
 1. O terminal CRT abrirá com o menu:
@@ -35,13 +35,13 @@ iwr https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/main/src/powe
 ### Método 1b – PowerShell 7 (Linux/macOS/WSL) 🐧
 
 ```bash
-pwsh -NoLogo -Command "irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/main/src/powershell/MasterNerd.Bootstrap.ps1 | iex"
+pwsh -NoLogo -Command "irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 | iex"
 ```
 
 ### Método 2 – Download tradicional (Windows)
 
-1. Baixe o ZIP: `https://github.com/eusoumanoelnetto/master_nerd/archive/refs/heads/main.zip`.
-1. Extraia e abra PowerShell na pasta extraída (`cd Master_Nerd-main`).
+1. Baixe o ZIP: `https://github.com/eusoumanoelnetto/master_nerd/archive/refs/heads/master.zip`.
+1. Extraia e abra PowerShell na pasta extraída (`cd Master_Nerd-master`).
 1. Execute:
 
 ```powershell
