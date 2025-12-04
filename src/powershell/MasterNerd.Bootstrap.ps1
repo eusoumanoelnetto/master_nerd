@@ -216,13 +216,6 @@ function Invoke-UsbFormatWizard {
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
 
-    # Confirmação final
-    $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
-    if ($confirm1 -ne $diskNum) {
-        Write-Host "Confirmação falhou. Operação cancelada." -ForegroundColor Yellow
-        return
-    }
-
     # === PASSO 1: CLEAN ===
     Write-Host ""
     Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
