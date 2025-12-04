@@ -397,7 +397,11 @@ function Invoke-Menu {
             Write-Host ""
             irm https://get.activated.win | iex
         } },
-        @{ Key = '3'; Name = 'Criar Pendrive Bootavel'; Handler = { Invoke-UsbDryRun } },
+        @{ Key = '3'; Name = 'Rodar Star Wars: Episode IV - A NEW HOPE'; Handler = { 
+            Write-Host "[>] Carregando Star Wars: Episode IV - A NEW HOPE..." -ForegroundColor Yellow
+            Write-Host ""
+            telnet towel.blinkenlights.nl
+        } },
         @{ Key = 'Q'; Name = 'Sair'; Handler = { return } }
     )
 
