@@ -141,17 +141,29 @@ function Invoke-UsbFormatWizard {
     Write-Host "[>] Formatação automática do pendrive (diskpart)" -ForegroundColor Yellow
     Ensure-Admin
 
-    $usbDisks = Get-Disk | Where-Object BusType -eq 'USB'
-    if (-not $usbDisks) {
-        Write-Warning "Nenhum pendrive USB detectado. Conecte o dispositivo e tente novamente."
+    Write-Host ""
+    Write-Host "[DISK] Listando todos os discos disponíveis:" -ForegroundColor Cyan
+    
+    $allDisks = Get-Disk
+    if (-not $allDisks) {
+        Write-Warning "Nenhum disco detectado no sistema."
         return
     }
 
-    Write-Host ""
-    Write-Host "[USB] Discos removíveis detectados:" -ForegroundColor Cyan
-    $usbDisks | ForEach-Object {
+    $allDisks | ForEach-Object {
         $sizeGB = [math]::Round($_.Size / 1GB, 2)
-        Write-Host ("  Disk {0} - {1}GB - {2} - Status: {3}" -f $_.Number, $sizeGB, $_.FriendlyName, $_.OperationalStatus)
+        $busType = $_.BusType
+        $highlight = if ($busType -eq 'USB') { 'Green' } else { 'Gray' }
+        Write-Host ("  Disk {0} - {1}GB - {2} - BusType: {3} - Status: {4}" -f $_.Number, $sizeGB, $_.FriendlyName, $busType, $_.OperationalStatus) -ForegroundColor $highlight
+    }
+
+    $usbDisks = $allDisks | Where-Object BusType -eq 'USB'
+    if ($usbDisks) {
+        Write-Host ""
+        Write-Host "[!] Discos USB destacados em verde acima." -ForegroundColor Yellow
+    } else {
+        Write-Host ""
+        Write-Warning "Nenhum disco USB detectado. Você pode selecionar outro disco, mas confirme que é removível!"
     }
 
     Write-Host ""
@@ -162,9 +174,18 @@ function Invoke-UsbFormatWizard {
     Write-Host ""
 
     $diskNum = Read-Host "Digite o número do disco (ex: 1)"
-    $targetDisk = $usbDisks | Where-Object Number -eq $diskNum
+    $targetDisk = $allDisks | Where-Object Number -eq $diskNum
     if (-not $targetDisk) {
-        throw "Disco $diskNum não encontrado ou não é USB."
+        throw "Disco $diskNum não encontrado."
+    }
+    
+    if ($targetDisk.BusType -ne 'USB') {
+        Write-Warning "ATENÇÃO: Disco selecionado NÃO é USB (BusType: $($targetDisk.BusType))"
+        $confirmNonUsb = Read-Host "Tem certeza que deseja continuar? Digite 'SIM' em maiúsculas"
+        if ($confirmNonUsb -ne 'SIM') {
+            Write-Host "Operação cancelada." -ForegroundColor Yellow
+            return
+        }
     }
 
     $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
