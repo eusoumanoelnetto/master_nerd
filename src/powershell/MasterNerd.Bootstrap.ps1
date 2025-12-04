@@ -117,7 +117,7 @@ function Invoke-ExtrasMenu {
             )
 
             foreach ($version in $windowsVersions) {
-                Write-Host ("• {0}" -f $version.Name) -ForegroundColor Cyan
+                Write-Host ("[{0}] {1}" -f $version.Key, $version.Name) -ForegroundColor Cyan
             }
             Write-Host ""
 
