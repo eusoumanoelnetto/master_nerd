@@ -234,7 +234,7 @@ function Invoke-Windows10EnterpriseLtscArchMenu {
     Write-Host ""
     
     $archs = @(
-        @{ Key = '1'; Name = 'x64'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_enterprise_ltsc_2021_x64_dvd_f318268e.iso' },
+        @{ Key = '1'; Name = 'x64'; Url = 'https://delivery.activated.win/dbmassgrave/pt-br_windows_10_consumer_editions_version_22h2_updated_oct_2025_x64_dvd_38efd00d.iso?t=qr5Y7dHfionNnjT5P9hSbzAkaponDYPs&P1=1764907382&P2=601&P3=2&P4=ymUWNtPr7UI6fwr%2FEUCnZuY10eikdYR6hvg0R27a1OQ%3D' },
         @{ Key = '2'; Name = 'x86'; Url = 'https://drive.massgrave.dev/pt-br_windows_10_enterprise_ltsc_2021_x86_dvd_d4aea182.iso' },
         @{ Key = 'V'; Name = 'Voltar'; Url = $null }
     )
