@@ -53,6 +53,22 @@ function Reset-CrtConsoleTheme {
     }
 }
 
+function Show-ProgressBar {
+    param(
+        [int]$Percent,
+        [string]$Status = "Processando"
+    )
+    
+    $barLength = 20
+    $filled = [math]::Floor(($Percent / 100) * $barLength)
+    $empty = $barLength - $filled
+    
+    $bar = ("[" + ("■" * $filled) + ("□" * $empty) + "]")
+    $percentText = "{0,3}%" -f $Percent
+    
+    Write-Host "`r$bar $percentText $Status" -NoNewline -ForegroundColor Green
+}
+
 function Test-IsAdmin {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal $identity
@@ -311,6 +327,7 @@ exit
     }
 
     Write-Host "[>] Formatando com $fileSystem..." -ForegroundColor Yellow
+    Write-Host ""
 
     # === PASSO 4: FORMAT ===
     $formatScript = @"
@@ -325,15 +342,44 @@ exit
     $formatScript | Set-Content -Path $tempFile -Encoding ASCII
 
     try {
-        $output = diskpart /s $tempFile 2>&1
-        $output | ForEach-Object { Write-Host $_ -ForegroundColor Gray }
-        if ($LASTEXITCODE -eq 0) {
-            Write-Host ""
+        $job = Start-Job -ScriptBlock {
+            param($tempFile)
+            diskpart /s $tempFile 2>&1
+        } -ArgumentList $tempFile
+
+        $lastPercent = 0
+        Show-ProgressBar -Percent 0 -Status "Iniciando formatação..."
+        Start-Sleep -Milliseconds 500
+
+        while ($job.State -eq 'Running') {
+            $output = Receive-Job -Job $job
+            
+            foreach ($line in $output) {
+                if ($line -match '(\d+)\s+por\s+cento\s+conclu[ií]do') {
+                    $percent = [int]$matches[1]
+                    if ($percent -ne $lastPercent) {
+                        Show-ProgressBar -Percent $percent -Status "Formatando..."
+                        $lastPercent = $percent
+                    }
+                }
+            }
+            
+            Start-Sleep -Milliseconds 100
+        }
+
+        $finalOutput = Receive-Job -Job $job
+        Remove-Job -Job $job -Force
+
+        Show-ProgressBar -Percent 100 -Status "Concluído!"
+        Write-Host ""
+        Write-Host ""
+
+        if ($LASTEXITCODE -eq 0 -or ($finalOutput -match 'formatou com êxito')) {
             Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Green
             Write-Host "║ [OK] FORMATAÇÃO CONCLUÍDA COM SUCESSO!         ║" -ForegroundColor Green
             Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Green
         } else {
-            throw "FORMAT falhou. Código: $LASTEXITCODE"
+            throw "FORMAT falhou. Verifique o output acima."
         }
     } finally {
         Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
