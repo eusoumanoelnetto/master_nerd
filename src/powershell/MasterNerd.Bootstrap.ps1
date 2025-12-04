@@ -140,6 +140,111 @@ function Invoke-SystemDiagnostics {
     }
 }
 
+function Invoke-StarWars {
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ STAR WARS: Episode IV - A NEW HOPE             ║" -ForegroundColor Yellow
+    Write-Host "║ (The most legendary nerd sysadmin project)     ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+
+    # Verifica se Telnet Client está instalado
+    Write-Host "[>] Verificando Telnet Client..." -ForegroundColor Yellow
+    $telnetStatus = Get-WindowsOptionalFeature -Online -FeatureName TelnetClient -ErrorAction SilentlyContinue
+
+    if ($telnetStatus.State -eq 'Enabled') {
+        Write-Host "[OK] Telnet Client já está ativado!" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "[>] Conectando a towel.blinkenlights.nl..." -ForegroundColor Cyan
+        Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
+        Write-Host ""
+        Start-Sleep -Milliseconds 800
+        telnet towel.blinkenlights.nl
+        return
+    }
+
+    if ($telnetStatus.State -eq 'Disabled') {
+        Write-Host "[!] Telnet Client não está ativado" -ForegroundColor Yellow
+        Write-Host "[>] Ativando Telnet Client..." -ForegroundColor Yellow
+        Write-Host ""
+
+        Ensure-Admin
+
+        try {
+            $enableJob = Enable-WindowsOptionalFeature -Online -FeatureName TelnetClient -NoRestart
+            
+            if ($enableJob.RestartNeeded) {
+                Write-Host ""
+                Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+                Write-Host "║ REINICIALIZAÇÃO NECESSÁRIA                     ║" -ForegroundColor Yellow
+                Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+                Write-Host ""
+                Write-Host "[!] Telnet Client foi ativado, mas requer reinicialização." -ForegroundColor Yellow
+                Write-Host ""
+                Write-Host "[1] Reiniciar agora" -ForegroundColor Cyan
+                Write-Host "[2] Reiniciar manualmente depois (rodar Star Wars sem restart)" -ForegroundColor Cyan
+                Write-Host ""
+
+                $restartChoice = Read-Host "Escolha"
+
+                if ($restartChoice -eq '1') {
+                    Write-Host ""
+                    Write-Host "[>] Reiniciando o PC em 10 segundos..." -ForegroundColor Yellow
+                    Start-Sleep -Seconds 10
+                    Restart-Computer -Force
+                } elseif ($restartChoice -eq '2') {
+                    Write-Host ""
+                    Write-Host "[!] O Telnet Client será ativado após o próximo restart." -ForegroundColor Yellow
+                    Write-Host "[>] Tentando conectar mesmo assim..." -ForegroundColor Cyan
+                    Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
+                    Write-Host ""
+                    Start-Sleep -Milliseconds 800
+                    
+                    try {
+                        telnet towel.blinkenlights.nl
+                    } catch {
+                        Write-Host ""
+                        Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Red
+                        Write-Host "║ [ERRO] Telnet não disponível sem restart       ║" -ForegroundColor Red
+                        Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Red
+                        Write-Host ""
+                        Write-Host "⚠️  Para ativar o Telnet Client permanentemente:" -ForegroundColor Yellow
+                        Write-Host "    1. Reinicie o PC" -ForegroundColor Yellow
+                        Write-Host "    2. Volte ao menu principal" -ForegroundColor Yellow
+                        Write-Host "    3. Selecione [3] novamente" -ForegroundColor Yellow
+                        Write-Host ""
+                        Write-Host "Pressione ENTER para voltar ao menu..." -ForegroundColor Cyan
+                        Read-Host
+                    }
+                }
+            } else {
+                Write-Host "[OK] Telnet Client ativado com sucesso (sem restart necessário)!" -ForegroundColor Green
+                Write-Host ""
+                Write-Host "[>] Conectando a towel.blinkenlights.nl..." -ForegroundColor Cyan
+                Write-Host "    Use ESC+[ para sair do telnet" -ForegroundColor DarkYellow
+                Write-Host ""
+                Start-Sleep -Milliseconds 800
+                telnet towel.blinkenlights.nl
+            }
+        } catch {
+            Write-Host ""
+            Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Red
+            Write-Host "║ [ERRO] Falha ao ativar Telnet Client           ║" -ForegroundColor Red
+            Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Red
+            Write-Host ""
+            Write-Host "Erro: $($_.Exception.Message)" -ForegroundColor Yellow
+            Write-Host ""
+            Write-Host "Pressione ENTER para voltar ao menu..." -ForegroundColor Cyan
+            Read-Host
+        }
+    } else {
+        Write-Host "[?] Estado do Telnet Client desconhecido: $($telnetStatus.State)" -ForegroundColor Yellow
+        Write-Host ""
+        Write-Host "Pressione ENTER para voltar ao menu..." -ForegroundColor Cyan
+        Read-Host
+    }
+}
+
 function Invoke-UsbDryRun {
     Write-Host "[>] Modo dry-run para preparação de pendrive" -ForegroundColor Yellow
     $disks = Get-Disk | Where-Object BusType -eq 'USB'
@@ -397,11 +502,7 @@ function Invoke-Menu {
             Write-Host ""
             irm https://get.activated.win | iex
         } },
-        @{ Key = '3'; Name = 'Rodar Star Wars: Episode IV - A NEW HOPE'; Handler = { 
-            Write-Host "[>] Carregando Star Wars: Episode IV - A NEW HOPE..." -ForegroundColor Yellow
-            Write-Host ""
-            telnet towel.blinkenlights.nl
-        } },
+        @{ Key = '3'; Name = 'Rodar Star Wars: Episode IV - A NEW HOPE'; Handler = { Invoke-StarWars } },
         @{ Key = 'Q'; Name = 'Sair'; Handler = { return } }
     )
 
