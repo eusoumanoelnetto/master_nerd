@@ -10,52 +10,33 @@ Terminal nerd-cyberpunk com scripts PowerShell portáteis para automação de Wi
 - **Assets (`assets/ui`)**: fontes bitmap, presets de Windows Terminal e arte retro-futurista.
 - **Docs (`docs`)**: referências rápidas, guias de campo, checklists de preparação.
 
-## Download / Como usar
+## Download / Como usar?
 
-### Método 1 – PowerShell (Windows 10+ / Windows 11) ⚡
+### Método PowerShell ❤️
 
-1. Abra **PowerShell/Terminal** como Administrador (Win+X → Terminal/Powershell).
+1. Abra PowerShell (não CMD). Clique com botão direito no menu Iniciar e selecione PowerShell ou Terminal.
 1. Copie e cole o comando abaixo e pressione Enter:
 
 ```powershell
-irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 | iex
+irm https://get.masternerd.win | iex
 ```
 
-Alternativa legada (caso `irm` esteja bloqueado):
+1. Pronto! O menu CRT aparecerá com as opções disponíveis.
 
-```powershell
-iwr https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 -UseBasicParsing | iex
-```
+---
 
-1. O terminal CRT abrirá com o menu:
-	- `[1] Formatar Pendrive` (placeholder seguro – exige admin)
-	- `[2] Microsoft-Activation-Scripts` (abre repositório oficial)
-	- `[3] Criar Pendrive Bootavel` (dry-run guiado)
+### Alternativa – Download Manual
 
-### Método 1b – PowerShell 7 (Linux/macOS/WSL) 🐧
+1. Baixe: `https://github.com/eusoumanoelnetto/master_nerd/archive/refs/heads/master.zip`
+1. Extraia o ZIP
+1. Localize `src/powershell/MasterNerd.Bootstrap.ps1` e execute
+1. Pronto
 
-```bash
-pwsh -NoLogo -Command "irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/src/powershell/MasterNerd.Bootstrap.ps1 | iex"
-```
+---
 
-### Método 2 – Download tradicional (Windows)
-
-1. Baixe o ZIP: `https://github.com/eusoumanoelnetto/master_nerd/archive/refs/heads/master.zip`.
-1. Extraia e abra PowerShell na pasta extraída (`cd Master_Nerd-master`).
-1. Execute:
-
-```powershell
-Set-ExecutionPolicy -Scope Process RemoteSigned -Force
-./src/powershell/MasterNerd.Bootstrap.ps1
-```
-
-1. Para ações específicas (ex.: apenas dry-run), use `-Action UsbDryRun` ou `-Action MenuPreview`.
-
-### Notas rápidas
-
-- `irm|iex` baixa e executa o script direto do GitHub. Só use URLs oficiais do projeto.
-- Sem privilégios de administrador, o menu limita operações destrutivas.
-- O modo `MenuPreview` mostra a interface sem interagir (bom para demos e CI).
+> [!NOTE]
+> O comando IRM no PowerShell baixa um script de uma URL especificada, e o comando IEX o executa.
+> Sempre verifique a URL antes de executar e confirme a fonte ao baixar manualmente os arquivos.
 
 ## Roadmap imediato
 
