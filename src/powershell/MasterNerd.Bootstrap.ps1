@@ -102,7 +102,7 @@ function Invoke-ExtrasMenu {
             Write-Host ""
             
             $windowsVersions = @(
-                @{ Key = '1'; Name = 'Windows 11'; Url = 'https://www.microsoft.com/software-download/windows11' },
+                @{ Key = '1'; Name = 'Windows 11'; Url = 'https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_pt-br.iso' },
                 @{ Key = '2'; Name = 'Windows 10'; Url = 'https://www.microsoft.com/software-download/windows10' },
                 @{ Key = '3'; Name = 'Windows 10 / 11 Enterprise LTSC'; Url = 'https://www.microsoft.com/evalcenter/download-windows-10-enterprise' },
                 @{ Key = '4'; Name = 'Windows ARM64'; Url = 'https://www.microsoft.com/software-download/windows11arm64' },
