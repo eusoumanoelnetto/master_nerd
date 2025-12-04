@@ -141,42 +141,61 @@ function Invoke-UsbFormatWizard {
     Write-Host "[>] Formatação automática do pendrive (diskpart)" -ForegroundColor Yellow
     Ensure-Admin
 
-    Write-Host ""
-    Write-Host "[DISK] Listando todos os discos disponíveis:" -ForegroundColor Cyan
-    
-    $allDisks = Get-Disk
-    if (-not $allDisks) {
-        Write-Warning "Nenhum disco detectado no sistema."
-        return
-    }
+    $formatSelected = $false
 
-    $allDisks | ForEach-Object {
-        $sizeGB = [math]::Round($_.Size / 1GB, 2)
-        $busType = $_.BusType
-        $highlight = if ($busType -eq 'USB') { 'Green' } else { 'Gray' }
-        Write-Host ("  Disk {0} - {1}GB - {2} - BusType: {3} - Status: {4}" -f $_.Number, $sizeGB, $_.FriendlyName, $busType, $_.OperationalStatus) -ForegroundColor $highlight
-    }
-
-    $usbDisks = $allDisks | Where-Object BusType -eq 'USB'
-    if ($usbDisks) {
+    while (-not $formatSelected) {
         Write-Host ""
-        Write-Host "[!] Discos USB destacados em verde acima." -ForegroundColor Yellow
-    } else {
+        Write-Host "[DISK] Listando todos os discos disponíveis:" -ForegroundColor Cyan
+        
+        $allDisks = Get-Disk
+        if (-not $allDisks) {
+            Write-Warning "Nenhum disco detectado no sistema."
+            return
+        }
+
+        $allDisks | ForEach-Object {
+            $sizeGB = [math]::Round($_.Size / 1GB, 2)
+            $busType = $_.BusType
+            $highlight = if ($busType -eq 'USB') { 'Green' } else { 'Gray' }
+            Write-Host ("  Disk {0} - {1}GB - {2} - BusType: {3} - Status: {4}" -f $_.Number, $sizeGB, $_.FriendlyName, $busType, $_.OperationalStatus) -ForegroundColor $highlight
+        }
+
+        $usbDisks = $allDisks | Where-Object BusType -eq 'USB'
+        if ($usbDisks) {
+            Write-Host ""
+            Write-Host "[!] Discos USB destacados em verde acima." -ForegroundColor Yellow
+        } else {
+            Write-Host ""
+            Write-Warning "Nenhum disco USB detectado. Você pode selecionar outro disco, mas confirme que é removível!"
+        }
+
         Write-Host ""
-        Write-Warning "Nenhum disco USB detectado. Você pode selecionar outro disco, mas confirme que é removível!"
-    }
+        Write-Host "[R] Refrescar lista | [Número] Selecionar disco" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "==================== ATENÇÃO ====================" -ForegroundColor Red
+        Write-Host "A formatação apagará TODOS OS DADOS do pendrive." -ForegroundColor Yellow
+        Write-Host "Certifique-se de ter backup antes de continuar." -ForegroundColor Yellow
+        Write-Host "================================================" -ForegroundColor Red
+        Write-Host ""
 
-    Write-Host ""
-    Write-Host "==================== ATENÇÃO ====================" -ForegroundColor Red
-    Write-Host "A formatação apagará TODOS OS DADOS do pendrive." -ForegroundColor Yellow
-    Write-Host "Certifique-se de ter backup antes de continuar." -ForegroundColor Yellow
-    Write-Host "================================================" -ForegroundColor Red
-    Write-Host ""
+        $diskNum = Read-Host "Digite o número do disco (ex: 1) ou R para refrescar"
+        
+        if ($diskNum -eq 'R' -or $diskNum -eq 'r') {
+            Write-Host "[>] Refrescando lista de discos..." -ForegroundColor Yellow
+            Start-Sleep -Milliseconds 800
+            Clear-Host
+            Write-Host "[>] Formatação automática do pendrive (diskpart)" -ForegroundColor Yellow
+            continue
+        }
 
-    $diskNum = Read-Host "Digite o número do disco (ex: 1)"
-    $targetDisk = $allDisks | Where-Object Number -eq $diskNum
-    if (-not $targetDisk) {
-        throw "Disco $diskNum não encontrado."
+        $targetDisk = $allDisks | Where-Object Number -eq $diskNum
+        if (-not $targetDisk) {
+            Write-Host "Disco '$diskNum' não encontrado. Tente novamente." -ForegroundColor Yellow
+            Write-Host ""
+            continue
+        }
+
+        $formatSelected = $true
     }
     
     if ($targetDisk.BusType -ne 'USB') {
@@ -190,7 +209,8 @@ function Invoke-UsbFormatWizard {
 
     $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
     if ($confirm1 -ne $diskNum) {
-        throw "Confirmação falhou. Operação cancelada."
+        Write-Host "Confirmação falhou. Operação cancelada." -ForegroundColor Yellow
+        return
     }
 
     $confirm2 = Read-Host "Digite 'FORMATAR' (em maiúsculas) para prosseguir"
