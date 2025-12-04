@@ -21,9 +21,9 @@ function Show-CrtBanner {
     $banner = @'
  __  __           _              _   _               _ 
 |  \/  | __ _ ___| |_ ___ _ __  | \ | | ___ _ __ ___| |
-| |\/| |/ _` / __| __/ _ \ '__| |  \| |/ _ \ '__/   | |
-| |  | | (_| \__ \ ||  __/ |    | |\  |  __/ | |  ()| |
-|_|  |_|\__,_|___/\__\___|_|    |_| \_|\___|_|  \___|_|
+| |\/| |/ _` / __| __/ _ \ '__| |  \| |/ _ \ '__/     |
+| |  | | (_| \__ \ ||  __/ |    | |\  |  __/ | |  ()  |
+|_|  |_|\__,_|___/\__\___|_|    |_| \_|\___|_|  \_____|
 
                     By Manoel Coelho
 '@
@@ -209,45 +209,131 @@ function Invoke-UsbFormatWizard {
         }
     }
 
+    $sizeGB = [math]::Round($targetDisk.Size / 1GB, 2)
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host "Disco selecionado: Disk $diskNum - $sizeGB GB" -ForegroundColor Green
+    Write-Host "================================================" -ForegroundColor Cyan
+    Write-Host ""
+
+    # Confirmação final
     $confirm1 = Read-Host "Digite o número do disco NOVAMENTE para confirmar"
     if ($confirm1 -ne $diskNum) {
         Write-Host "Confirmação falhou. Operação cancelada." -ForegroundColor Yellow
         return
     }
 
-    $confirm2 = Read-Host "Digite 'FORMATAR' (em maiúsculas) para prosseguir"
-    if ($confirm2 -ne "FORMATAR") {
+    # === PASSO 1: CLEAN ===
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ PASSO 1: LIMPAR O DISCO (Clean)               ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host "Isto removerá todas as partições do disco." -ForegroundColor Yellow
+    Write-Host ""
+    $cleanConfirm = Read-Host "Deseja prosseguir com CLEAN? (S/N)"
+    if ($cleanConfirm -ne 'S' -and $cleanConfirm -ne 's') {
         Write-Host "Operação cancelada pelo usuário." -ForegroundColor Yellow
         return
     }
 
-    Write-Host "[>] Preparando script diskpart (list disk -> select -> clean -> create -> format NTFS)..." -ForegroundColor Yellow
-
-    $diskpartScript = @"
+    Write-Host "[>] Executando CLEAN..." -ForegroundColor Yellow
+    $cleanScript = @"
 select disk $diskNum
-list disk
 clean
+exit
+"@
+
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $cleanScript | Set-Content -Path $tempFile -Encoding ASCII
+
+    try {
+        $output = diskpart /s $tempFile 2>&1
+        $output | ForEach-Object { Write-Host $_ -ForegroundColor Gray }
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[OK] CLEAN concluído com sucesso!" -ForegroundColor Green
+        } else {
+            throw "CLEAN falhou. Código: $LASTEXITCODE"
+        }
+    } finally {
+        Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+    }
+
+    # === PASSO 2: CREATE PARTITION ===
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ PASSO 2: CRIAR PARTIÇÃO PRIMÁRIA               ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host "[>] Criando partição primária..." -ForegroundColor Yellow
+
+    $createScript = @"
+select disk $diskNum
 create partition primary
-format fs=ntfs quick
+exit
+"@
+
+    $tempFile = [System.IO.Path]::GetTempFileName()
+    $createScript | Set-Content -Path $tempFile -Encoding ASCII
+
+    try {
+        $output = diskpart /s $tempFile 2>&1
+        $output | ForEach-Object { Write-Host $_ -ForegroundColor Gray }
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "[OK] Partição criada com sucesso!" -ForegroundColor Green
+        } else {
+            throw "CREATE PARTITION falhou. Código: $LASTEXITCODE"
+        }
+    } finally {
+        Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
+    }
+
+    # === PASSO 3: SELECIONAR FILE SYSTEM ===
+    Write-Host ""
+    Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
+    Write-Host "║ PASSO 3: SELECIONAR SISTEMA DE ARQUIVOS        ║" -ForegroundColor Yellow
+    Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "[1] exFAT   (Compatibilidade universal, até 4GB por arquivo)" -ForegroundColor Cyan
+    Write-Host "[2] NTFS    (Windows nativo, sem limite de tamanho de arquivo)" -ForegroundColor Cyan
+    Write-Host "[3] FAT32   (Compatibilidade máxima, limite 4GB por arquivo)" -ForegroundColor Cyan
+    Write-Host ""
+
+    $fsChoice = Read-Host "Selecione o sistema de arquivos (1/2/3)"
+    
+    $fileSystem = switch ($fsChoice) {
+        "1" { "exfat" }
+        "2" { "ntfs" }
+        "3" { "fat32" }
+        default {
+            Write-Host "Opção inválida. Usando NTFS como padrão." -ForegroundColor Yellow
+            "ntfs"
+        }
+    }
+
+    Write-Host "[>] Formatando com $fileSystem..." -ForegroundColor Yellow
+
+    # === PASSO 4: FORMAT ===
+    $formatScript = @"
+select disk $diskNum
+format fs=$fileSystem quick
 assign
 exit
 "@
 
     $tempFile = [System.IO.Path]::GetTempFileName()
-    $diskpartScript | Set-Content -Path $tempFile -Encoding ASCII
+    $formatScript | Set-Content -Path $tempFile -Encoding ASCII
 
     try {
-        Write-Host "[>] Executando diskpart..." -ForegroundColor Yellow
         $output = diskpart /s $tempFile 2>&1
-        $output | ForEach-Object { Write-Host $_ }
-
+        $output | ForEach-Object { Write-Host $_ -ForegroundColor Gray }
         if ($LASTEXITCODE -eq 0) {
-            Write-Host "[OK] Formatação concluída com sucesso!" -ForegroundColor Green
+            Write-Host ""
+            Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Green
+            Write-Host "║ [OK] FORMATAÇÃO CONCLUÍDA COM SUCESSO!         ║" -ForegroundColor Green
+            Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Green
         } else {
-            throw "Diskpart retornou erro. Código: $LASTEXITCODE"
+            throw "FORMAT falhou. Código: $LASTEXITCODE"
         }
-    }
-    finally {
+    } finally {
         Remove-Item $tempFile -Force -ErrorAction SilentlyContinue
     }
 }
