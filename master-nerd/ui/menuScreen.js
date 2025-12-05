@@ -1,22 +1,50 @@
 import chalk from 'chalk';
 import { applyScanlines, wrapWithCrtBorder } from './crtEffects.js';
 
-const labelColor = '#ff8c42';
+const orange = '#ff8c42';
+const white = '#ffffff';
+const cyan = '#00ffcc';
 
 export function renderMenuScreen(options) {
-  const title = chalk.hex(labelColor)('╔═ MASTER NERD OPERATIONS ═╗');
-  const life = chalk.hex('#ff4d6d')('♥ ♥ ♥');
-  const sub = chalk.hex('#b8a0ff')('SELECT YOUR MISSION');
+  // Header with arcade style
+  const title = chalk.hex(orange)('═ MASTER NERD OPERATIONS ═');
+  const lives = chalk.hex(orange)('♥ ♥ ♥');
+  
+  const header = [
+    `┌─────────────────────────────────────────────┐`,
+    `│ ${title.padEnd(43)} │`,
+    `│ ${lives.padEnd(43)} │`,
+    `└─────────────────────────────────────────────┘`
+  ].map(line => chalk.hex('#8c52ff')(line)).join('\n');
 
-  const list = options
+  // Menu options with pixel-style slots (P1, P2, P3, etc.)
+  const menuItems = options
     .map((opt, idx) => {
-      const slot = chalk.hex('#ffd966')(`P${idx + 1}`);
-      return `${slot} ► ${chalk.hex('#00ffcc')(opt.label)}`;
+      const slot = chalk.hex(orange)(`P${idx + 1}`);
+      const label = chalk.hex(cyan)(opt.label);
+      return `  ${slot} ►  ${label}`;
     })
     .join('\n');
 
-  const footer = chalk.hex('#7d6bfa')('CRT CURVATURE // HOLD ON');
+  // Game screen background
+  const screenBg = [];
+  for (let i = 0; i < 8; i++) {
+    const glyph = i % 2 === 0 ? '░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░' : '▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒';
+    screenBg.push(chalk.hex('#541c94')(glyph));
+  }
 
-  const block = [title, life, '', sub, '', list, '', footer].join('\n');
-  return applyScanlines(wrapWithCrtBorder(block));
+  // Footer
+  const footer = chalk.hex('#7d6bfa')('  CRT CURVATURE // HOLD ON');
+
+  const content = [
+    header,
+    '',
+    menuItems,
+    '',
+    ...screenBg,
+    '',
+    footer
+  ].join('\n');
+
+  return applyScanlines(wrapWithCrtBorder(content));
 }
