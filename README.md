@@ -12,6 +12,18 @@ Terminal nerd-cyberpunk com scripts PowerShell portáteis para automação de Wi
 
 ## Download / Como usar?
 
+### 🚀 CLIQUE ÚNICO - Master Nerd App (Windows EXE)
+
+[![Download Master Nerd](https://img.shields.io/badge/Download-MasterNerd.exe-ff8c42?style=for-the-badge&logo=windows)](https://github.com/eusoumanoelnetto/master_nerd/releases/latest/download/MasterNerd.exe)
+
+1. Clique no botão acima para baixar `MasterNerd.exe`.
+2. Execute o arquivo.
+3. Pronto! O menu CRT arcade aparecerá automaticamente.
+
+**Nota:** O primeiro carregamento é rápido. O app traz tudo que precisa embutido.
+
+---
+
 ### Método PowerShell ❤️
 
 1. Abra PowerShell (não CMD). Clique com botão direito no menu Iniciar e selecione PowerShell ou Terminal.
@@ -25,7 +37,7 @@ irm https://raw.githubusercontent.com/eusoumanoelnetto/master_nerd/master/get.ps
 
 ---
 
-### Alternativa – Download Manual
+### Alternativa – Download Manual (Repositório)
 
 1. Baixe: `https://github.com/eusoumanoelnetto/master_nerd/archive/refs/heads/master.zip`
 1. Extraia o ZIP

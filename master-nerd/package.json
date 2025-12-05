@@ -1,0 +1,20 @@
+{
+  "name": "master-nerd",
+  "version": "1.0.0",
+  "description": "Retro arcade CRT CLI for the Master Nerd toolkit.",
+  "main": "masternerd.js",
+  "type": "module",
+  "bin": {
+    "master-nerd": "masternerd.js"
+  },
+  "scripts": {
+    "start": "node masternerd.js"
+  },
+  "author": "Master Nerd",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "figlet": "^1.7.0",
+    "inquirer": "^9.3.7"
+  }
+}
