@@ -180,15 +180,24 @@ class MasterNerdApp {
       `;
       // Adiciona eventos com delay para garantir que o DOM está pronto
       setTimeout(() => {
-        document.querySelectorAll('[data-fs]').forEach(btn => {
+        console.log('Configurando eventos dos botões de formato');
+        const fsButtons = document.querySelectorAll('[data-fs]');
+        console.log('Botões encontrados:', fsButtons.length);
+        
+        fsButtons.forEach(btn => {
+          console.log('Adicionando evento para:', btn.getAttribute('data-fs'));
           btn.addEventListener('click', function(e) {
+            console.log('Botão clicado:', this.getAttribute('data-fs'));
             const fs = this.getAttribute('data-fs');
             self.formatWithFs(fs);
           });
         });
+        
         const voltarBtn = document.querySelector('.btn-voltar-fs');
+        console.log('Botão voltar encontrado:', !!voltarBtn);
         if (voltarBtn) {
           voltarBtn.addEventListener('click', function() {
+            console.log('Botão voltar clicado');
             self.renderMenuScreen();
           });
         }
@@ -489,21 +498,33 @@ class MasterNerdApp {
   }
 
   async formatWithFs(fs) {
+    console.log('formatWithFs chamado com:', fs);
     const statusEl = document.getElementById('format-status');
     const diskOutput = document.getElementById('disk-output');
-    if (!statusEl) return;
-
+    
     const diskNumber = this.lastSelectedDisk;
+    console.log('Disco selecionado:', diskNumber);
+    
     if (diskNumber === undefined || diskNumber === null) {
-      statusEl.textContent = 'Selecione um disco antes de formatar.';
-      statusEl.classList.add('error');
+      console.error('Nenhum disco selecionado');
+      if (statusEl) {
+        statusEl.textContent = 'Selecione um disco antes de formatar.';
+        statusEl.classList.add('error');
+      }
+      alert('Nenhum disco foi selecionado para formatação.');
       return;
     }
 
+    // Verificar status de admin antes de continuar
+    await this.updateAdminStatus();
+    
     if (!this.isElevated) {
-      statusEl.textContent = 'Ative o modo Admin para formatar a partição.';
-      statusEl.classList.add('error');
-      this.showAdminModal();
+      console.error('Sem permissões de admin');
+      if (statusEl) {
+        statusEl.textContent = 'Ative o modo Admin para formatar a partição.';
+        statusEl.classList.add('error');
+      }
+      alert('É necessário executar como Administrador para formatar.');
       return;
     }
 
@@ -604,9 +625,11 @@ class MasterNerdApp {
           `Disco ${diskNumber} foi limpo com sucesso.\nAgora escolha o formato de arquivo`,
           true,
           () => {
+            console.log('Callback do modal executado, disco:', diskNumber);
             // Renderiza tela só com escolha de formato, sem lista de discos
-            this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
             this.lastSelectedDisk = diskNumber;
+            console.log('lastSelectedDisk definido como:', this.lastSelectedDisk);
+            this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
           }
         );
       }, 1000);
