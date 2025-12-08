@@ -16,7 +16,16 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
-  // mainWindow.webContents.openDevTools();
+  // Abra o DevTools apenas em ambiente de desenvolvimento ou quando solicitado
+  const shouldOpenDevTools = process.env.NODE_ENV === 'development' || process.argv.includes('--devtools');
+  if (shouldOpenDevTools) {
+    mainWindow.webContents.openDevTools();
+  }
+
+  // Log renderer console messages to main process for debugging
+  mainWindow.webContents.on('console-message', (_event, level, message, line, sourceId) => {
+    console.log(`[renderer:${level}] ${message} (${sourceId}:${line})`);
+  });
 }
 
 app.on('ready', createWindow);

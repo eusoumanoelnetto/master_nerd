@@ -152,8 +152,40 @@ class MasterNerdApp {
     alert(`Launching: ${this.missions[index]?.label || 'Em breve'}`);
   }
 
-  renderFormatPendriveScreen() {
+  renderFormatPendriveScreen(options = {}) {
+    const { skipInstructions = false, onlyFsChoice = false } = options;
     const app = document.getElementById('app');
+    if (onlyFsChoice) {
+      app.innerHTML = `
+        <div class="screen-content format-screen">
+          <h1 class="title">MASTER NERD</h1>
+          <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+          <div class="subtitle">FORMATAR PENDRIVE CMD</div>
+          <div class="format-panel">
+            <div class="fs-choice" style="display:flex; flex-direction:column; gap:12px; align-items:center; margin-top:40px;">
+              <div class="fs-label">Escolha qual vai ser o formato:</div>
+              <div class="fs-buttons">
+                <button data-fs="ntfs" class="btn format-btn">NTFS</button>
+                <button data-fs="fat32" class="btn format-btn">FAT32</button>
+                <button data-fs="exfat" class="btn format-btn">exFAT</button>
+              </div>
+            </div>
+            <div style="margin-top:30px;">
+              <button id="back-to-menu" class="btn format-btn danger">Voltar</button>
+            </div>
+          </div>
+        </div>
+      `;
+      // Adiciona eventos dos botões de formato e voltar
+      document.querySelectorAll('.fs-buttons button').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const fs = btn.getAttribute('data-fs');
+          this.formatWithFs(fs);
+        });
+      });
+      document.getElementById('back-to-menu').addEventListener('click', () => this.renderMenuScreen());
+      return;
+    }
     app.innerHTML = `
       <div class="screen-content format-screen">
         <h1 class="title">MASTER NERD</h1>
@@ -252,9 +284,14 @@ class MasterNerdApp {
       closeInstructionsBtn.addEventListener('click', startDiskpartAfterAcknowledgement);
     }
     if (instructionsModal) {
-      instructionsModal.classList.add('open');
-      if (closeInstructionsBtn) {
-        closeInstructionsBtn.focus();
+      if (!skipInstructions) {
+        instructionsModal.classList.add('open');
+        if (closeInstructionsBtn) {
+          closeInstructionsBtn.focus();
+        }
+      } else {
+        instructionsModal.classList.remove('open');
+        instructionsModal.style.display = 'none';
       }
     }
 
@@ -272,16 +309,6 @@ class MasterNerdApp {
       this.updateAdminStatus().then(() => this.fetchDiskList());
     });
     document.getElementById('clean-disk').addEventListener('click', () => this.cleanSelectedDisk());
-    document.getElementById('back-to-menu').addEventListener('click', () => this.renderMenuScreen());
-    if (fsButtons && fsButtons.length) {
-      fsButtons.forEach((btn) => {
-        btn.addEventListener('click', () => this.formatWithFs(btn.getAttribute('data-fs')));
-      });
-    }
-    const elevateBtn = document.getElementById('btn-elevate');
-    if (elevateBtn) {
-      elevateBtn.addEventListener('click', () => this.requestElevation());
-    }
   }
 
   async fetchDiskList() {
@@ -320,33 +347,28 @@ class MasterNerdApp {
 
     try {
       const res = await this.electronAPI.launchScript('format-pendrive', { action: 'list' });
-        let text = [res?.stdout, res?.stderr].filter(Boolean).join('\n').trim();
-      
-        // Highlight removable drives (pendrives) by adding HTML markup
-        if (text) {
-          const lines = text.split('\n');
-          const highlightedLines = lines.map(line => {
-            // Check if line contains a disk entry
-            if (/Disco\s+\d+/.test(line)) {
-              // Parse size to identify likely pendrives (typically <= 128GB)
-              const sizeMatch = line.match(/(\d+)\s+(MB|GB)/);
-              if (sizeMatch) {
-                const size = parseInt(sizeMatch[1]);
-                const unit = sizeMatch[2];
-                // Highlight drives under 128GB as likely pendrives
-                if ((unit === 'MB') || (unit === 'GB' && size <= 128)) {
-                  return `<span class="pendrive-highlight">${line}</span>`;
-                }
+      let text = [res?.stdout, res?.stderr].filter(Boolean).join('\n').trim();
+
+      if (text) {
+        const lines = text.split('\n');
+        const highlightedLines = lines.map(line => {
+          if (/Disco\s+\d+/.test(line)) {
+            const sizeMatch = line.match(/(\d+)\s+(MB|GB)/);
+            if (sizeMatch) {
+              const size = parseInt(sizeMatch[1]);
+              const unit = sizeMatch[2];
+              if ((unit === 'MB') || (unit === 'GB' && size <= 128)) {
+                return `<span class="pendrive-highlight">${line}</span>`;
               }
             }
-            return line;
-          });
-          text = highlightedLines.join('\n');
-        }
-      
-        outputEl.innerHTML = text || 'Diskpart não retornou dados. Execute o app como Administrador.';
+          }
+          return line;
+        });
+        text = highlightedLines.join('\n');
+      }
 
-      // Após carregar a lista, esconda header para liberar espaço
+      outputEl.innerHTML = text || 'Diskpart não retornou dados. Execute o app como Administrador.';
+
       const instructionsBtn = document.getElementById('show-instructions');
       const adminPanel = document.querySelector('.admin-status-panel');
       if (instructionsBtn) instructionsBtn.style.display = 'none';
@@ -369,6 +391,79 @@ class MasterNerdApp {
     }
   }
 
+  renderLoadingScreen(title = 'CARREGANDO', message = 'Processando...') {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="screen-content loading-screen">
+        <h1 class="loading-title">${title}</h1>
+        
+        <div class="loading-status" id="loading-message">${message}</div>
+
+        <div class="progress-container">
+          <div class="progress-label">Processamento em Andamento</div>
+          <div class="progress-bar" id="progress-bar">
+            <div class="progress-fill" id="progress-fill" style="width: 0%;">
+              <div class="progress-percentage" id="progress-percentage">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="loading-dots" id="loading-dots">.</div>
+      </div>
+    `;
+  }
+
+  updateLoadingProgress(percentage, message = null) {
+    const fillEl = document.getElementById('progress-fill');
+    const percentageEl = document.getElementById('progress-percentage');
+    const messageEl = document.getElementById('loading-message');
+    const dotsEl = document.getElementById('loading-dots');
+
+    if (fillEl && percentageEl) {
+      const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+      fillEl.style.width = clampedPercentage + '%';
+      percentageEl.textContent = clampedPercentage + '%';
+    }
+
+    if (message && messageEl) {
+      messageEl.textContent = message;
+    }
+
+    // Animate dots
+    if (dotsEl) {
+      const dotCount = (Math.floor(Date.now() / 300) % 4) + 1;
+      dotsEl.textContent = '.'.repeat(dotCount);
+    }
+  }
+
+  showResultModal(title, message, isSuccess = true, callback = null) {
+    const app = document.getElementById('app');
+    const icon = isSuccess ? '✓' : '✗';
+    
+    app.innerHTML = `
+      <div class="result-modal open">
+        <div class="result-modal-content ${isSuccess ? 'success' : 'error'}">
+          <div class="result-icon ${isSuccess ? 'success' : 'error'}">
+            ${icon}
+          </div>
+          <h2 class="result-title">${title}</h2>
+          <p class="result-message">${message}</p>
+          <div class="result-actions">
+            <button id="result-confirm" class="btn format-btn success">OK</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('result-confirm').addEventListener('click', () => {
+      if (callback) {
+        callback();
+      } else {
+        this.renderFormatPendriveScreen({ skipInstructions: true });
+      }
+    });
+  }
+
   async formatWithFs(fs) {
     const statusEl = document.getElementById('format-status');
     const diskOutput = document.getElementById('disk-output');
@@ -388,20 +483,44 @@ class MasterNerdApp {
       return;
     }
 
+    // Show loading screen
+    this.renderLoadingScreen('FORMATANDO', `Disco ${diskNumber} com ${fs.toUpperCase()}`);
+    
+    // Simulate progress updates
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress = Math.min(progress + Math.random() * 15, 90);
+      this.updateLoadingProgress(Math.floor(progress));
+    }, 300);
+
     try {
-      statusEl.textContent = `Formatando disco ${diskNumber} em ${fs.toUpperCase()}...`;
-      statusEl.classList.remove('error');
-        if (diskOutput) diskOutput.style.display = 'none'; // Hide disk output during formatting
       await this.electronAPI.launchScript('format-pendrive', { action: 'format', disk: diskNumber, fs });
-      statusEl.textContent = `Disco ${diskNumber} formatado como ${fs.toUpperCase()}.`;
-      // Não atualiza a lista aqui para não mexer na tela antes da escolha de formato
-        if (diskOutput) diskOutput.style.display = 'none'; // Keep disk output hidden after formatting
+      
+      clearInterval(progressInterval);
+      this.updateLoadingProgress(100, `Disco ${diskNumber} formatado com sucesso!`);
+      
+      setTimeout(() => {
+        this.showResultModal(
+          'SUCESSO!',
+          `Disco ${diskNumber} foi formatado com sucesso\nem ${fs.toUpperCase()}`,
+          true
+        );
+      }, 1000);
+
     } catch (err) {
+      clearInterval(progressInterval);
       console.error('Falha ao formatar', err);
       const msg = err?.error || err?.stderr || err?.message || JSON.stringify(err);
-      statusEl.textContent = `Erro ao formatar o disco ${diskNumber}.\n${msg}`;
-      statusEl.classList.add('error');
-      if (diskOutput) diskOutput.style.display = 'block';
+      
+      this.updateLoadingProgress(0, `Erro ao formatar disco ${diskNumber}`);
+      
+      setTimeout(() => {
+        this.showResultModal(
+          'ERRO!',
+          `Falha ao formatar disco ${diskNumber}.\n${msg}`,
+          false
+        );
+      }, 1000);
     }
   }
 
@@ -417,56 +536,71 @@ class MasterNerdApp {
       return;
     }
 
-    const setStatus = (message, isError = false) => {
-      statusEl.textContent = message;
-      statusEl.classList.toggle('error', isError);
-    };
-
     const diskNumber = Number(inputEl.value);
     if (!Number.isInteger(diskNumber) || diskNumber < 0) {
-      setStatus('Informe um número de disco válido.', true);
+      statusEl.textContent = 'Informe um número de disco válido.';
+      statusEl.classList.add('error');
       return;
     }
 
     if (!this.electronAPI?.launchScript) {
-      setStatus('API indisponível. Reinicie o aplicativo.', true);
+      statusEl.textContent = 'API indisponível. Reinicie o aplicativo.';
+      statusEl.classList.add('error');
       return;
     }
 
     if (!this.isElevated) {
-      setStatus('Ative o modo Admin antes de limpar discos.', true);
+      statusEl.textContent = 'Ative o modo Admin antes de limpar discos.';
+      statusEl.classList.add('error');
       return;
     }
 
-    setStatus(`Executando diskpart clean no disco ${diskNumber}...`);
-    if (diskOutput) diskOutput.style.display = 'none';
+    // Show loading screen
+    this.renderLoadingScreen('LIMPANDO DISCO', `Disco ${diskNumber}`);
+    
+    // Simulate progress updates
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+      progress = Math.min(progress + Math.random() * 20, 85);
+      this.updateLoadingProgress(Math.floor(progress));
+    }, 250);
 
     try {
       const res = await this.electronAPI.launchScript('format-pendrive', { action: 'select', disk: diskNumber });
-      const text = [res?.stdout, res?.stderr].filter(Boolean).join('\n').trim();
-      setStatus(text || `Disco ${diskNumber} limpo com sucesso.`);
-
-      // Após limpar/criar partição, habilite escolha de formato e esconda controles de seleção
-      if (refreshBtn) refreshBtn.style.display = 'none';
-      if (cleanBtn) cleanBtn.style.display = 'none';
-      if (backBtn) backBtn.style.display = 'none';
-      if (selectRow) selectRow.style.display = 'none';
-
-      const fsChoice = document.getElementById('fs-choice');
-      if (fsChoice) {
-        fsChoice.style.display = 'flex';
-      }
-
+      
+      clearInterval(progressInterval);
+      this.updateLoadingProgress(100, `Disco ${diskNumber} limpo com sucesso!`);
+      
       // Guardar o disco selecionado para formatação
       this.lastSelectedDisk = diskNumber;
+      
+      setTimeout(() => {
+        this.showResultModal(
+          'DISCO LIMPO!',
+          `Disco ${diskNumber} foi limpo com sucesso.\nAgora escolha o formato de arquivo`,
+          true,
+          () => {
+            // Renderiza tela só com escolha de formato, sem lista de discos
+            this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
+            this.lastSelectedDisk = diskNumber;
+          }
+        );
+      }, 1000);
 
-      await this.fetchDiskList();
-        if (diskOutput) diskOutput.style.display = 'none'; // Keep disk output hidden after cleaning
     } catch (err) {
+      clearInterval(progressInterval);
       console.error('Falha ao limpar disco', err);
       const msg = err?.error || err?.stderr || err?.message || JSON.stringify(err);
-      setStatus(`Erro ao limpar o disco ${diskNumber}.\n${msg}\nExecute o app como Administrador.`, true);
-      if (diskOutput) diskOutput.style.display = 'block';
+      
+      this.updateLoadingProgress(0, `Erro ao limpar disco ${diskNumber}`);
+      
+      setTimeout(() => {
+        this.showResultModal(
+          'ERRO!',
+          `Falha ao limpar disco ${diskNumber}.\n${msg}`,
+          false
+        );
+      }, 1000);
     }
   }
 
