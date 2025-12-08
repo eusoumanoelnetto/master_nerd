@@ -155,6 +155,8 @@ class MasterNerdApp {
   renderFormatPendriveScreen(options = {}) {
     const { skipInstructions = false, onlyFsChoice = false } = options;
     const app = document.getElementById('app');
+    const self = this;
+    
     if (onlyFsChoice) {
       app.innerHTML = `
         <div class="screen-content format-screen">
@@ -165,25 +167,32 @@ class MasterNerdApp {
             <div class="fs-choice" style="display:flex; flex-direction:column; gap:12px; align-items:center; margin-top:40px;">
               <div class="fs-label">Escolha qual vai ser o formato:</div>
               <div class="fs-buttons">
-                <button data-fs="ntfs" class="btn format-btn">NTFS</button>
-                <button data-fs="fat32" class="btn format-btn">FAT32</button>
-                <button data-fs="exfat" class="btn format-btn">exFAT</button>
+                <button class="fs-btn-ntfs btn format-btn" data-fs="ntfs">NTFS</button>
+                <button class="fs-btn-fat32 btn format-btn" data-fs="fat32">FAT32</button>
+                <button class="fs-btn-exfat btn format-btn" data-fs="exfat">exFAT</button>
               </div>
             </div>
             <div style="margin-top:30px;">
-              <button id="back-to-menu" class="btn format-btn danger">Voltar</button>
+              <button class="btn-voltar-fs btn format-btn danger">Voltar</button>
             </div>
           </div>
         </div>
       `;
-      // Adiciona eventos dos botões de formato e voltar
-      document.querySelectorAll('.fs-buttons button').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const fs = btn.getAttribute('data-fs');
-          this.formatWithFs(fs);
+      // Adiciona eventos com delay para garantir que o DOM está pronto
+      setTimeout(() => {
+        document.querySelectorAll('[data-fs]').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            const fs = this.getAttribute('data-fs');
+            self.formatWithFs(fs);
+          });
         });
-      });
-      document.getElementById('back-to-menu').addEventListener('click', () => this.renderMenuScreen());
+        const voltarBtn = document.querySelector('.btn-voltar-fs');
+        if (voltarBtn) {
+          voltarBtn.addEventListener('click', function() {
+            self.renderMenuScreen();
+          });
+        }
+      }, 50);
       return;
     }
     app.innerHTML = `
@@ -309,6 +318,21 @@ class MasterNerdApp {
       this.updateAdminStatus().then(() => this.fetchDiskList());
     });
     document.getElementById('clean-disk').addEventListener('click', () => this.cleanSelectedDisk());
+    
+    // Adiciona eventos aos botões de formato (quando estão visíveis)
+    const fsButtonsOnFullScreen = document.querySelectorAll('#fs-choice button[data-fs]');
+    fsButtonsOnFullScreen.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const fs = btn.getAttribute('data-fs');
+        this.formatWithFs(fs);
+      });
+    });
+    
+    // Evento do botão voltar na tela completa
+    const backBtnOnFullScreen = document.querySelector('.format-select-row #back-to-menu');
+    if (backBtnOnFullScreen) {
+      backBtnOnFullScreen.addEventListener('click', () => this.renderMenuScreen());
+    }
   }
 
   async fetchDiskList() {
