@@ -1,20 +1,46 @@
 {
   "name": "master-nerd",
   "version": "1.0.0",
-  "description": "Retro arcade CRT CLI for the Master Nerd toolkit.",
-  "main": "masternerd.js",
-  "type": "module",
-  "bin": {
-    "master-nerd": "masternerd.js"
-  },
+  "description": "Retro arcade CRT desktop app for the Master Nerd toolkit.",
+  "main": "main.js",
   "scripts": {
-    "start": "node masternerd.js"
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "author": "Master Nerd",
   "license": "MIT",
-  "dependencies": {
-    "chalk": "^5.3.0",
-    "figlet": "^1.7.0",
-    "inquirer": "^9.3.7"
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
+  },
+  "build": {
+    "appId": "com.masternerd.app",
+    "productName": "Master Nerd",
+    "files": [
+      "main.js",
+      "preload.js",
+      "src/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }

@@ -1,0 +1,129 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const { execFile } = require('child_process');
+
+let mainWindow;
+
+function createWindow() {
+  mainWindow = new BrowserWindow({
+    width: 700,
+    height: 900,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  // mainWindow.webContents.openDevTools();
+}
+
+app.on('ready', createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
+
+ipcMain.handle('launch-script', async (_event, scriptName, payload = {}) => {
+  if (process.platform !== 'win32') {
+    throw new Error('Somente Windows para diskpart');
+  }
+
+  const runCommand = (cmd, args) => new Promise((resolve, reject) => {
+    execFile(cmd, args, { windowsHide: true }, (error, stdout, stderr) => {
+      if (error) {
+        return reject({ error: error.message, stdout, stderr });
+      }
+      resolve({ stdout, stderr });
+    });
+  });
+
+  switch (scriptName) {
+    case 'format-pendrive': {
+      // payload.action: 'list' | 'select'
+      // payload.disk: number (required for select)
+      const action = payload.action || 'list';
+      if (action === 'init') {
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', '@("list disk","exit") | diskpart']);
+      }
+      if (action === 'list') {
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', '@("list disk","exit") | diskpart']);
+      }
+      if (action === 'select') {
+        if (typeof payload.disk !== 'number') {
+          throw new Error('Número de disco não informado');
+        }
+        const psCmd = `$cmd = @('select disk ${payload.disk}','clean','create partition primary'); $cmd | diskpart`;
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', psCmd]);
+      }
+      if (action === 'format') {
+        if (typeof payload.disk !== 'number' || !payload.fs) {
+          throw new Error('Disco ou sistema de arquivos não informado');
+        }
+        const fs = String(payload.fs).toLowerCase();
+        const allowed = ['ntfs', 'fat32', 'exfat'];
+        if (!allowed.includes(fs)) {
+          throw new Error(`Sistema de arquivos inválido: ${payload.fs}`);
+        }
+        const psCmd = `$cmd = @('select disk ${payload.disk}','select partition 1','format fs=${fs} quick'); $cmd | diskpart`;
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', psCmd]);
+      }
+      throw new Error(`Ação desconhecida: ${action}`);
+    }
+    default:
+      throw new Error(`Script desconhecido: ${scriptName}`);
+  }
+});
+
+ipcMain.handle('check-admin', async () => {
+  if (process.platform !== 'win32') {
+    return false;
+  }
+
+  return new Promise((resolve) => {
+    const script = '([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)';
+    execFile('powershell.exe', ['-NoProfile', '-Command', script], { windowsHide: true }, (error, stdout) => {
+      if (error) {
+        resolve(false);
+        return;
+      }
+      resolve(/True/i.test((stdout || '').trim()));
+    });
+  });
+});
+
+ipcMain.handle('elevate-app', async () => {
+  if (process.platform !== 'win32') {
+    throw new Error('A elevação automática está disponível apenas no Windows');
+  }
+
+  const escapeQuotes = (value) => String(value || '').replace(/"/g, '""');
+  const exePath = escapeQuotes(process.execPath);
+  const args = process.argv.slice(1).map(escapeQuotes);
+  const argList = args.length ? `@("${args.join('","')}")` : '@()';
+  const script = `
+    $argsList = ${argList};
+    Start-Process -FilePath "${exePath}" -ArgumentList $argsList -Verb RunAs
+  `;
+
+  await new Promise((resolve, reject) => {
+    execFile('powershell.exe', ['-NoProfile', '-Command', script], { windowsHide: true }, (error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+
+  app.quit();
+});

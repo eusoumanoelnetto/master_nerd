@@ -97,7 +97,7 @@ function Invoke-ExtrasMenu {
         @{ Key = '1'; Name = 'Download Windows'; Handler = { 
             Write-Host ""
             Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
-            Write-Host "║ SELEÇÃO DE VERSÃO DO WINDOWS                   ║" -ForegroundColor Yellow
+            Write-Host "║ SELEÇÃO DE VERSAO DO WINDOWS                   ║" -ForegroundColor Yellow
             Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
             Write-Host ""
             
@@ -203,7 +203,7 @@ function Invoke-Windows10Menu {
 function Invoke-Windows10EnterpriseLtscMenu {
     Write-Host ""
     Write-Host "╔════════════════════════════════════════════════╗" -ForegroundColor Yellow
-    Write-Host "║ WINDOWS ENTERPRISE LTSC - SELEÇÃO DE VERSÃO    ║" -ForegroundColor Yellow
+    Write-Host "║ WINDOWS ENTERPRISE LTSC - SELEÇÃO DE VERSAO    ║" -ForegroundColor Yellow
     Write-Host "╚════════════════════════════════════════════════╝" -ForegroundColor Yellow
     Write-Host ""
     
