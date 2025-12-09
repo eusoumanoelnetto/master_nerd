@@ -538,7 +538,7 @@ class MasterNerdApp {
         : `Pendrive renomeado para "${trimmedLabel}".`;
 
       this.showResultModal('Nome atualizado!', message, true, () => {
-        this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
+        this.renderMenuScreen();
       });
     } catch (err) {
       console.error('Falha ao renomear', err);
