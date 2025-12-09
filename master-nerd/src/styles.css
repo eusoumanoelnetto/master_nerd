@@ -1103,3 +1103,81 @@ h1.title {
   box-shadow: 0 0 20px var(--neon-green) !important;
 }
 
+/* ==========================================
+     RENAME MODAL
+     ========================================== */
+
+.rename-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 40;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.rename-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.rename-modal {
+    width: 90%;
+    max-width: 420px;
+    background: rgba(0, 20, 30, 0.98);
+    border: 4px solid var(--neon-purple);
+    box-shadow: 0 0 35px var(--neon-purple);
+    padding: 32px 28px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    border-radius: 10px;
+}
+
+.rename-modal h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--neon-purple);
+    text-shadow: 0 0 14px var(--neon-purple);
+    font-family: 'Press Start 2P', cursive;
+}
+
+.rename-modal p {
+    margin: 0;
+    color: #ffffff;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.rename-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(5, 5, 20, 0.85);
+    border: 2px solid var(--neon-purple);
+    box-shadow: 0 0 18px rgba(188, 19, 254, 0.45);
+    color: #ffffff;
+    text-align: center;
+    font-size: 0.95rem;
+    font-family: 'Fira Code', 'Courier New', monospace;
+}
+
+.rename-input:focus {
+    outline: none;
+    box-shadow: 0 0 28px rgba(188, 19, 254, 0.7);
+}
+
+.rename-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+

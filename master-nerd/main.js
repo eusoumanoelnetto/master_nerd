@@ -86,6 +86,61 @@ ipcMain.handle('launch-script', async (_event, scriptName, payload = {}) => {
         const psCmd = `$cmd = @('select disk ${payload.disk}','select partition 1','format fs=${fs} quick'); $cmd | diskpart`;
         return runCommand('powershell.exe', ['-NoProfile', '-Command', psCmd]);
       }
+      if (action === 'volume-info') {
+        if (typeof payload.disk !== 'number') {
+          throw new Error('Número de disco não informado');
+        }
+        const psCmd = `
+          $diskNumber = ${payload.disk};
+          $partition = Get-Partition -DiskNumber $diskNumber -ErrorAction SilentlyContinue |
+            Where-Object { $_.Type -ne 'Reserved' } |
+            Sort-Object -Property Size -Descending |
+            Select-Object -First 1;
+          if (-not $partition) { return }
+          $volume = $partition | Get-Volume -ErrorAction SilentlyContinue;
+          if (-not $volume) { return }
+          $info = [PSCustomObject]@{
+            DriveLetter = $volume.DriveLetter
+            FileSystem = $volume.FileSystem
+            SizeGB = [Math]::Round($volume.Size / 1GB, 2)
+            FreeGB = [Math]::Round($volume.SizeRemaining / 1GB, 2)
+          };
+          $info | ConvertTo-Json -Compress
+        `;
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', psCmd]);
+      }
+      if (action === 'rename-volume') {
+        if (typeof payload.disk !== 'number' || !payload.label) {
+          throw new Error('Disco ou novo nome não informado');
+        }
+
+        const sanitizedLabel = String(payload.label)
+          .replace(/"/g, '')
+          .trim();
+
+        if (!sanitizedLabel) {
+          throw new Error('Nome inválido para o volume');
+        }
+
+        const psCmd = `
+          $diskNumber = ${payload.disk};
+          $label = "${sanitizedLabel}";
+          $partition = Get-Partition -DiskNumber $diskNumber -ErrorAction SilentlyContinue |
+            Where-Object { $_.Type -ne 'Reserved' } |
+            Sort-Object -Property Size -Descending |
+            Select-Object -First 1;
+          if (-not $partition) {
+            throw "Partição não encontrada para o disco $diskNumber";
+          }
+          $volume = $partition | Get-Volume -ErrorAction SilentlyContinue;
+          if (-not $volume -or -not $volume.DriveLetter) {
+            throw "Volume não possui letra atribuída";
+          }
+          Set-Volume -DriveLetter $volume.DriveLetter -NewFileSystemLabel $label | Out-Null
+        `;
+
+        return runCommand('powershell.exe', ['-NoProfile', '-Command', psCmd]);
+      }
       throw new Error(`Ação desconhecida: ${action}`);
     }
     default:

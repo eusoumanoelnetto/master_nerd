@@ -8,6 +8,7 @@ class MasterNerdApp {
       { label: 'Extras' }
     ];
     this.isElevated = false;
+    this.lastFormatInfo = null;
   }
 
   init() {
@@ -166,42 +167,45 @@ class MasterNerdApp {
           <div class="format-panel">
             <div class="fs-choice" style="display:flex; flex-direction:column; gap:12px; align-items:center; margin-top:40px;">
               <div class="fs-label">Escolha qual vai ser o formato:</div>
-              <div class="fs-buttons">
-                <button class="fs-btn-ntfs btn format-btn" data-fs="ntfs">NTFS</button>
-                <button class="fs-btn-fat32 btn format-btn" data-fs="fat32">FAT32</button>
-                <button class="fs-btn-exfat btn format-btn" data-fs="exfat">exFAT</button>
+              <div class="fs-buttons" id="fs-buttons-container">
+                <button id="btn-ntfs" class="btn format-btn" type="button">NTFS</button>
+                <button id="btn-fat32" class="btn format-btn" type="button">FAT32</button>
+                <button id="btn-exfat" class="btn format-btn" type="button">exFAT</button>
               </div>
             </div>
             <div style="margin-top:30px;">
-              <button class="btn-voltar-fs btn format-btn danger">Voltar</button>
+              <button id="btn-voltar-fs" class="btn format-btn danger" type="button">Voltar</button>
             </div>
           </div>
         </div>
       `;
-      // Adiciona eventos com delay para garantir que o DOM está pronto
-      setTimeout(() => {
-        console.log('Configurando eventos dos botões de formato');
-        const fsButtons = document.querySelectorAll('[data-fs]');
-        console.log('Botões encontrados:', fsButtons.length);
-        
-        fsButtons.forEach(btn => {
-          console.log('Adicionando evento para:', btn.getAttribute('data-fs'));
-          btn.addEventListener('click', function(e) {
-            console.log('Botão clicado:', this.getAttribute('data-fs'));
-            const fs = this.getAttribute('data-fs');
-            self.formatWithFs(fs);
-          });
+      
+      // Usar event delegation no container
+      const container = document.getElementById('fs-buttons-container');
+      if (container) {
+        container.addEventListener('click', (e) => {
+          if (e.target.id === 'btn-ntfs') {
+            console.log('NTFS clicado');
+            self.formatWithFs('NTFS');
+          } else if (e.target.id === 'btn-fat32') {
+            console.log('FAT32 clicado');
+            self.formatWithFs('FAT32');
+          } else if (e.target.id === 'btn-exfat') {
+            console.log('exFAT clicado');
+            self.formatWithFs('exfat');
+          }
         });
-        
-        const voltarBtn = document.querySelector('.btn-voltar-fs');
-        console.log('Botão voltar encontrado:', !!voltarBtn);
-        if (voltarBtn) {
-          voltarBtn.addEventListener('click', function() {
-            console.log('Botão voltar clicado');
-            self.renderMenuScreen();
-          });
-        }
-      }, 50);
+      }
+      
+      // Botão voltar
+      const voltarBtn = document.getElementById('btn-voltar-fs');
+      if (voltarBtn) {
+        voltarBtn.addEventListener('click', () => {
+          console.log('Voltar clicado');
+          self.renderMenuScreen();
+        });
+      }
+      
       return;
     }
     app.innerHTML = `
@@ -346,61 +350,67 @@ class MasterNerdApp {
 
   async fetchDiskList() {
     const outputEl = document.getElementById('disk-output');
+    const statusEl = document.getElementById('format-status');
+
     if (!outputEl) {
       return;
     }
 
     if (!this.electronAPI?.launchScript) {
       outputEl.textContent = 'API indisponível. Reinicie o aplicativo.';
-      return;
-    }
-
-    if (!this.isElevated) {
-      outputEl.textContent = 'Permissões elevadas necessárias. Clique em "Ativar modo Admin" para continuar.';
-      this.showAdminModal();
-      return;
-    }
-
-    outputEl.textContent = 'Executando diskpart...';
-
-    try {
-      await this.electronAPI.launchScript('format-pendrive', { action: 'init' });
-      outputEl.textContent = 'Executando list disk...';
-    } catch (err) {
-      console.error('Falha ao iniciar diskpart', err);
-      const msg = err?.error || err?.stderr || err?.message || JSON.stringify(err);
-      let finalMsg = `Erro ao executar diskpart.\n${msg}`;
-      if (!this.isElevated) {
-        finalMsg += '\nExecute o app como Administrador.';
-        this.showAdminModal();
+      if (statusEl) {
+        statusEl.textContent = 'API indisponível. Reinicie o aplicativo.';
+        statusEl.classList.add('error');
       }
-      outputEl.textContent = finalMsg;
       return;
     }
+
+    outputEl.textContent = 'Listando discos...';
 
     try {
       const res = await this.electronAPI.launchScript('format-pendrive', { action: 'list' });
-      let text = [res?.stdout, res?.stderr].filter(Boolean).join('\n').trim();
+      let text = (res?.stdout || '').trim();
 
-      if (text) {
-        const lines = text.split('\n');
-        const highlightedLines = lines.map(line => {
-          if (/Disco\s+\d+/.test(line)) {
-            const sizeMatch = line.match(/(\d+)\s+(MB|GB)/);
-            if (sizeMatch) {
-              const size = parseInt(sizeMatch[1]);
-              const unit = sizeMatch[2];
-              if ((unit === 'MB') || (unit === 'GB' && size <= 128)) {
-                return `<span class="pendrive-highlight">${line}</span>`;
-              }
-            }
-          }
-          return line;
-        });
-        text = highlightedLines.join('\n');
+      if (!text) {
+        text = (res?.stderr || '').trim();
       }
 
-      outputEl.innerHTML = text || 'Diskpart não retornou dados. Execute o app como Administrador.';
+      if (!text) {
+        text = 'Diskpart não retornou dados. Execute o app como Administrador.';
+      }
+
+      const lines = text.split(/\r?\n/);
+      const highlightedLines = lines.map((line) => {
+        const sanitized = line
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+
+        const match = sanitized.match(/Disco\s+(\d+)/i);
+        if (!match) {
+          return sanitized;
+        }
+
+        const diskNumber = match[1];
+        const isSelected = String(this.lastSelectedDisk ?? '') === String(diskNumber);
+        const highlighted = sanitized.replace(
+          match[0],
+          `<span class="pendrive-highlight">${match[0]}</span>`
+        );
+
+        if (isSelected) {
+          return `${highlighted} <span class="pendrive-highlight">[SELECIONADO]</span>`;
+        }
+
+        return highlighted;
+      });
+
+      outputEl.innerHTML = highlightedLines.join('\n');
+
+      if (statusEl) {
+        statusEl.textContent = '';
+        statusEl.classList.remove('error');
+      }
 
       const instructionsBtn = document.getElementById('show-instructions');
       const adminPanel = document.querySelector('.admin-status-panel');
@@ -414,8 +424,194 @@ class MasterNerdApp {
         finalMsg += '\nExecute o app como Administrador.';
         this.showAdminModal();
       }
+
       outputEl.textContent = finalMsg;
+
+      if (statusEl) {
+        statusEl.textContent = finalMsg;
+        statusEl.classList.add('error');
+      }
     }
+  }
+
+  async getVolumeInfo(diskNumber) {
+    if (!this.electronAPI?.launchScript) {
+      return null;
+    }
+
+    try {
+      const res = await this.electronAPI.launchScript('format-pendrive', {
+        action: 'volume-info',
+        disk: Number(diskNumber)
+      });
+
+      const raw = res?.stdout?.trim();
+      if (!raw) {
+        return null;
+      }
+
+      return JSON.parse(raw);
+    } catch (err) {
+      console.error('Falha ao obter informações de volume', err);
+      return null;
+    }
+  }
+
+  buildFormatSuccessMessage(diskNumber, fs, volumeInfo) {
+    const lines = [
+      `Disco ${diskNumber} foi formatado com sucesso`,
+      `em ${fs.toUpperCase()}`
+    ];
+
+    if (volumeInfo) {
+      const driveLetter = volumeInfo.DriveLetter ? ` (${volumeInfo.DriveLetter}:)` : '';
+      const freeValue = volumeInfo.FreeGB ?? 'N/D';
+      const totalValue = volumeInfo.SizeGB ?? 'N/D';
+      lines.push(`Espaço disponível: ${freeValue} GB de ${totalValue} GB${driveLetter}`);
+    }
+
+    return lines.join('\n');
+  }
+
+  async promptRenameVolume() {
+    if (!this.lastFormatInfo?.diskNumber) {
+      return;
+    }
+
+    const currentResultModal = document.querySelector('.result-modal');
+    if (currentResultModal) {
+      currentResultModal.remove();
+    }
+
+    const currentLetter = this.lastFormatInfo?.volumeInfo?.DriveLetter;
+    const defaultName = currentLetter ? `USB_${currentLetter}` : 'MASTER_NERD';
+    const userInput = await this.showRenamePromptModal(defaultName);
+
+    if (userInput === null) {
+      const successMessage = this.buildFormatSuccessMessage(
+        this.lastFormatInfo.diskNumber,
+        this.lastFormatInfo.fs,
+        this.lastFormatInfo.volumeInfo
+      );
+
+      this.showResultModal(
+        'SUCESSO!',
+        successMessage,
+        true,
+        () => this.renderFormatPendriveScreen({ skipInstructions: true }),
+        {
+          actions: [
+            {
+              label: 'RENOMEAR PENDRIVE',
+              variant: 'info',
+              handler: () => this.promptRenameVolume()
+            }
+          ]
+        }
+      );
+      return;
+    }
+
+    const trimmedLabel = userInput.trim().slice(0, 32);
+    if (!trimmedLabel) {
+      alert('Nome inválido. Operação cancelada.');
+      return;
+    }
+
+    this.renderLoadingScreen('RENOMEANDO', `Aplicando nome "${trimmedLabel}"`);
+
+    try {
+      await this.electronAPI.launchScript('format-pendrive', {
+        action: 'rename-volume',
+        disk: this.lastFormatInfo.diskNumber,
+        label: trimmedLabel
+      });
+
+      const volumeInfo = await this.getVolumeInfo(this.lastFormatInfo.diskNumber);
+      this.lastFormatInfo = {
+        ...this.lastFormatInfo,
+        volumeInfo: volumeInfo || this.lastFormatInfo.volumeInfo
+      };
+
+      const message = volumeInfo?.DriveLetter
+        ? `Pendrive renomeado para "${trimmedLabel}" (${volumeInfo.DriveLetter}:).`
+        : `Pendrive renomeado para "${trimmedLabel}".`;
+
+      this.showResultModal('Nome atualizado!', message, true, () => {
+        this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
+      });
+    } catch (err) {
+      console.error('Falha ao renomear', err);
+      const msg = err?.error || err?.stderr || err?.message || JSON.stringify(err);
+      this.showResultModal('Erro ao renomear', msg, false, () => {
+        this.renderFormatPendriveScreen({ skipInstructions: true, onlyFsChoice: true });
+      });
+    }
+  }
+
+  showRenamePromptModal(defaultValue = '') {
+    return new Promise((resolve) => {
+      const overlay = document.createElement('div');
+      overlay.className = 'rename-overlay open';
+      overlay.innerHTML = `
+        <div class="rename-modal">
+          <h2>RENOMEAR PENDRIVE</h2>
+          <p>Digite o novo nome para o pendrive:</p>
+          <input id="rename-input" class="rename-input" maxlength="32" value="${defaultValue || ''}">
+          <div class="rename-actions">
+            <button id="rename-cancel" class="btn format-btn danger">Cancelar</button>
+            <button id="rename-confirm" class="btn format-btn success">Confirmar</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(overlay);
+
+      const input = overlay.querySelector('#rename-input');
+      const confirmBtn = overlay.querySelector('#rename-confirm');
+      const cancelBtn = overlay.querySelector('#rename-cancel');
+
+      const cleanup = () => {
+        overlay.classList.remove('open');
+        setTimeout(() => overlay.remove(), 200);
+      };
+
+      const resolveWith = (value) => {
+        cleanup();
+        resolve(value);
+      };
+
+      if (input) {
+        setTimeout(() => {
+          input.focus();
+          input.select();
+        }, 50);
+
+        input.addEventListener('keydown', (event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            resolveWith(input.value);
+          } else if (event.key === 'Escape') {
+            event.preventDefault();
+            resolveWith(null);
+          }
+        });
+      }
+
+      if (confirmBtn) {
+        confirmBtn.addEventListener('click', () => resolveWith(input?.value ?? ''));
+      }
+
+      if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => resolveWith(null));
+      }
+
+      overlay.addEventListener('click', (event) => {
+        if (event.target === overlay) {
+          resolveWith(null);
+        }
+      });
+    });
   }
 
   showAdminModal() {
@@ -469,9 +665,10 @@ class MasterNerdApp {
     }
   }
 
-  showResultModal(title, message, isSuccess = true, callback = null) {
+  showResultModal(title, message, isSuccess = true, callback = null, options = {}) {
     const app = document.getElementById('app');
     const icon = isSuccess ? '✓' : '✗';
+    const extraActions = Array.isArray(options.actions) ? options.actions : [];
     
     app.innerHTML = `
       <div class="result-modal open">
@@ -482,6 +679,11 @@ class MasterNerdApp {
           <h2 class="result-title">${title}</h2>
           <p class="result-message">${message}</p>
           <div class="result-actions">
+            ${extraActions
+              .map((action, index) => `
+                <button id="extra-action-${index}" class="btn format-btn ${action.variant || ''}">${action.label}</button>
+              `)
+              .join('')}
             <button id="result-confirm" class="btn format-btn success">OK</button>
           </div>
         </div>
@@ -493,6 +695,29 @@ class MasterNerdApp {
         callback();
       } else {
         this.renderFormatPendriveScreen({ skipInstructions: true });
+      }
+    });
+
+    // Anexar handlers aos botões extras usando IDs
+    extraActions.forEach((action, index) => {
+      const btnId = `extra-action-${index}`;
+      const btn = document.getElementById(btnId);
+      console.log(`[DEBUG] Botão ${btnId} encontrado:`, !!btn, btn);
+      console.log(`[DEBUG] Handler tipo:`, typeof action.handler);
+      if (btn && typeof action.handler === 'function') {
+        btn.addEventListener('click', (e) => {
+          console.log(`[DEBUG] Botão ${btnId} clicado`, e);
+          console.log(`[DEBUG] Executando handler...`);
+          try {
+            action.handler();
+            console.log(`[DEBUG] Handler executado com sucesso`);
+          } catch (err) {
+            console.error(`[DEBUG] Erro ao executar handler:`, err);
+          }
+        });
+        console.log(`[DEBUG] Event listener anexado com sucesso`);
+      } else {
+        console.error(`[DEBUG] Falha ao anexar handler - btn:`, !!btn, 'handler:', typeof action.handler);
       }
     });
   }
@@ -540,6 +765,15 @@ class MasterNerdApp {
 
     try {
       await this.electronAPI.launchScript('format-pendrive', { action: 'format', disk: diskNumber, fs });
+
+      const volumeInfo = await this.getVolumeInfo(diskNumber);
+      const successMessage = this.buildFormatSuccessMessage(diskNumber, fs, volumeInfo);
+      this.lastFormatInfo = { diskNumber, fs, volumeInfo };
+      const extraActions = volumeInfo?.DriveLetter ? [{
+        label: 'RENOMEAR PENDRIVE',
+        variant: 'info',
+        handler: () => this.promptRenameVolume()
+      }] : [];
       
       clearInterval(progressInterval);
       this.updateLoadingProgress(100, `Disco ${diskNumber} formatado com sucesso!`);
@@ -547,8 +781,10 @@ class MasterNerdApp {
       setTimeout(() => {
         this.showResultModal(
           'SUCESSO!',
-          `Disco ${diskNumber} foi formatado com sucesso\nem ${fs.toUpperCase()}`,
-          true
+          successMessage,
+          true,
+          () => this.renderFormatPendriveScreen({ skipInstructions: true }),
+          { actions: extraActions }
         );
       }, 1000);
 
