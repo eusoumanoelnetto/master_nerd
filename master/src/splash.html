@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Master Nerd - Loading</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    
     * {
       margin: 0;
       padding: 0;
@@ -12,18 +14,21 @@
     }
 
     body {
-      font-family: 'Courier New', monospace;
-      background: #000;
-      color: #00ff00;
+      font-family: 'Press Start 2P', 'Courier New', monospace;
+      background: #0a0a0a;
+      color: #00ff41;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
       position: relative;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
     }
 
-    /* Scanlines effect */
+    /* Scanlines effect - mais grossas estilo CRT antigo */
     body::before {
       content: '';
       position: absolute;
@@ -31,14 +36,15 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
+      background: repeating-linear-gradient(
         to bottom,
-        rgba(0, 255, 0, 0) 50%,
-        rgba(0, 255, 0, 0.02) 50%
+        rgba(0, 255, 65, 0) 0px,
+        rgba(0, 255, 65, 0) 2px,
+        rgba(0, 255, 65, 0.08) 2px,
+        rgba(0, 255, 65, 0.08) 4px
       );
-      background-size: 100% 4px;
       pointer-events: none;
-      animation: scanlines 8s linear infinite;
+      animation: scanlines 12s linear infinite;
       z-index: 1;
     }
 
@@ -59,7 +65,7 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0, 255, 0, 0.03);
+      background: rgba(0, 255, 65, 0.03);
       pointer-events: none;
       animation: flicker 0.15s infinite;
       z-index: 2;
@@ -81,80 +87,146 @@
     }
 
     .logo {
-      font-size: 48px;
+      font-size: 42px;
       font-weight: bold;
       text-shadow: 
-        0 0 10px #00ff00,
-        0 0 20px #00ff00,
-        0 0 30px #00ff00,
-        0 0 40px #00ff00;
-      margin-bottom: 30px;
-      animation: glow 2s ease-in-out infinite;
-      letter-spacing: 3px;
+        4px 4px 0 #ff00ff,
+        0 0 20px #00ff41,
+        0 0 40px #00ff41;
+      margin-bottom: 40px;
+      animation: glow 3s ease-in-out infinite, glitchLogo 8s infinite;
+      letter-spacing: 4px;
+      color: #00ff41;
+      position: relative;
+    }
+
+    @keyframes glitchLogo {
+      0%, 90%, 100% {
+        transform: translate(0);
+      }
+      92% {
+        transform: translate(-2px, 2px);
+        text-shadow: 
+          4px 4px 0 #00ffff,
+          0 0 20px #ff00ff;
+      }
+      94% {
+        transform: translate(2px, -2px);
+        text-shadow: 
+          4px 4px 0 #ff00ff,
+          0 0 20px #00ffff;
+      }
     }
 
     @keyframes glow {
       0%, 100% {
         text-shadow: 
-          0 0 10px #00ff00,
-          0 0 20px #00ff00,
-          0 0 30px #00ff00,
-          0 0 40px #00ff00;
+          4px 4px 0 #ff00ff,
+          0 0 20px #00ff41,
+          0 0 40px #00ff41;
       }
       50% {
         text-shadow: 
-          0 0 20px #00ff00,
-          0 0 30px #00ff00,
-          0 0 40px #00ff00,
-          0 0 50px #00ff00,
-          0 0 60px #00ff00;
+          4px 4px 0 #ff00ff,
+          0 0 30px #00ff41,
+          0 0 50px #00ff41,
+          0 0 70px #00ff41;
       }
     }
 
     .subtitle {
-      font-size: 16px;
-      letter-spacing: 2px;
+      font-size: 12px;
+      letter-spacing: 3px;
       margin-bottom: 50px;
-      opacity: 0.8;
-      color: #00ff00;
+      color: #00ffff;
+      text-shadow: 2px 2px 0 #ff00ff;
+      animation: blink 2s infinite;
+    }
+
+    @keyframes blink {
+      0%, 49%, 100% {
+        opacity: 1;
+      }
+      50%, 99% {
+        opacity: 0.5;
+      }
     }
 
     .loading-text {
-      font-size: 20px;
-      margin-bottom: 20px;
-      letter-spacing: 2px;
+      font-size: 16px;
+      margin-bottom: 30px;
+      letter-spacing: 3px;
+      color: #ffff00;
+      text-shadow: 2px 2px 0 #ff00ff;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
     }
 
     .loading-bar-container {
-      width: 400px;
-      height: 30px;
-      border: 2px solid #00ff00;
+      width: 450px;
+      height: 40px;
+      border: 4px solid #00ff41;
       position: relative;
       margin: 0 auto;
       box-shadow: 
-        inset 0 0 10px rgba(0, 255, 0, 0.3),
-        0 0 10px rgba(0, 255, 0, 0.3);
+        inset 0 0 20px rgba(0, 255, 65, 0.5),
+        0 0 20px rgba(0, 255, 65, 0.5),
+        4px 4px 0 #ff00ff;
+      background: rgba(0, 0, 0, 0.8);
     }
 
     .loading-bar {
       height: 100%;
-      background: linear-gradient(
+      background: repeating-linear-gradient(
         90deg,
-        #00ff00 0%,
-        #00dd00 50%,
-        #00ff00 100%
+        #00ff41 0px,
+        #00ff41 20px,
+        #00dd33 20px,
+        #00dd33 40px
       );
       width: 0%;
-      animation: loading 2.5s ease-in-out forwards;
-      box-shadow: 0 0 20px #00ff00;
+      animation: loading 5.5s cubic-bezier(0.4, 0.0, 0.6, 1) forwards, shimmer 1s linear infinite;
+      box-shadow: 
+        0 0 30px #00ff41,
+        inset 0 0 20px rgba(255, 255, 255, 0.3);
+      border-right: 3px solid #ffff00;
     }
 
     @keyframes loading {
       0% {
         width: 0%;
       }
+      20% {
+        width: 15%;
+      }
+      40% {
+        width: 35%;
+      }
+      60% {
+        width: 60%;
+      }
+      80% {
+        width: 85%;
+      }
       100% {
         width: 100%;
+      }
+    }
+
+    @keyframes shimmer {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 40px 0;
       }
     }
 
@@ -163,12 +235,12 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 14px;
+      font-size: 16px;
       font-weight: bold;
       color: #000;
-      text-shadow: none;
+      text-shadow: 0 0 5px #ffff00;
       z-index: 10;
-      mix-blend-mode: difference;
+      letter-spacing: 2px;
     }
 
     .dots {
@@ -192,27 +264,29 @@
     }
 
     .boot-messages {
-      margin-top: 40px;
+      margin-top: 50px;
       text-align: left;
-      width: 500px;
+      width: 550px;
       margin-left: auto;
       margin-right: auto;
-      font-size: 12px;
-      line-height: 1.6;
-      opacity: 0.7;
+      font-size: 10px;
+      line-height: 2;
+      opacity: 0.9;
     }
 
     .boot-message {
       opacity: 0;
-      animation: fadeIn 0.3s forwards;
+      animation: fadeIn 0.5s forwards;
+      color: #00ff41;
     }
 
-    .boot-message:nth-child(1) { animation-delay: 0.2s; }
-    .boot-message:nth-child(2) { animation-delay: 0.5s; }
-    .boot-message:nth-child(3) { animation-delay: 0.8s; }
-    .boot-message:nth-child(4) { animation-delay: 1.1s; }
-    .boot-message:nth-child(5) { animation-delay: 1.4s; }
-    .boot-message:nth-child(6) { animation-delay: 1.7s; }
+    .boot-message:nth-child(1) { animation-delay: 0.5s; }
+    .boot-message:nth-child(2) { animation-delay: 1.2s; }
+    .boot-message:nth-child(3) { animation-delay: 2.0s; }
+    .boot-message:nth-child(4) { animation-delay: 2.8s; }
+    .boot-message:nth-child(5) { animation-delay: 3.6s; }
+    .boot-message:nth-child(6) { animation-delay: 4.4s; }
+    .boot-message:nth-child(7) { animation-delay: 5.2s; }
 
     @keyframes fadeIn {
       from {
@@ -220,17 +294,88 @@
         transform: translateX(-10px);
       }
       to {
-        opacity: 0.7;
+        opacity: 0.9;
         transform: translateX(0);
       }
     }
 
     .ok-indicator {
-      color: #00ff00;
+      color: #00ff41;
       font-weight: bold;
+      text-shadow: 0 0 10px #00ff41;
     }
 
-    /* Grid background */
+    .insert-coin {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #ffff00;
+      text-shadow: 2px 2px 0 #ff00ff;
+      animation: coinBlink 1s infinite;
+      letter-spacing: 2px;
+    }
+
+    @keyframes coinBlink {
+      0%, 49% {
+        opacity: 1;
+      }
+      50%, 100% {
+        opacity: 0;
+      }
+    }
+
+    .arcade-border {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      bottom: 20px;
+      border: 6px solid #ff00ff;
+      box-shadow: 
+        inset 0 0 30px rgba(255, 0, 255, 0.3),
+        0 0 30px rgba(0, 255, 65, 0.3);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .corner-decoration {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #00ffff;
+    }
+
+    .corner-decoration.top-left {
+      top: 15px;
+      left: 15px;
+      border-right: none;
+      border-bottom: none;
+    }
+
+    .corner-decoration.top-right {
+      top: 15px;
+      right: 15px;
+      border-left: none;
+      border-bottom: none;
+    }
+
+    .corner-decoration.bottom-left {
+      bottom: 15px;
+      left: 15px;
+      border-right: none;
+      border-top: none;
+    }
+
+    .corner-decoration.bottom-right {
+      bottom: 15px;
+      right: 15px;
+      border-left: none;
+      border-top: none;
+    }
+
+    /* Grid background - estilo arcade */
     .grid-bg {
       position: absolute;
       top: 0;
@@ -238,20 +383,35 @@
       width: 100%;
       height: 100%;
       background-image: 
-        linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      opacity: 0.3;
+        linear-gradient(rgba(0, 255, 65, 0.05) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.05) 2px, transparent 2px);
+      background-size: 40px 40px;
+      opacity: 0.5;
       z-index: 0;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% {
+        transform: translate(0, 0);
+      }
+      100% {
+        transform: translate(40px, 40px);
+      }
     }
   </style>
 </head>
 <body>
   <div class="grid-bg"></div>
+  <div class="arcade-border"></div>
+  <div class="corner-decoration top-left"></div>
+  <div class="corner-decoration top-right"></div>
+  <div class="corner-decoration bottom-left"></div>
+  <div class="corner-decoration bottom-right"></div>
   
   <div class="container">
     <div class="logo">MASTER NERD</div>
-    <div class="subtitle">━━━━━━ SYSTEM BOOT ━━━━━━</div>
+    <div class="subtitle">▓▓▓ SYSTEM BOOT ▓▓▓</div>
     
     <div class="loading-text">
       LOADING<span class="dots"></span>
@@ -263,20 +423,23 @@
     </div>
     
     <div class="boot-messages">
-      <div class="boot-message">&gt; Initializing system modules... <span class="ok-indicator">[OK]</span></div>
-      <div class="boot-message">&gt; Loading UI components... <span class="ok-indicator">[OK]</span></div>
-      <div class="boot-message">&gt; Checking system resources... <span class="ok-indicator">[OK]</span></div>
-      <div class="boot-message">&gt; Establishing connections... <span class="ok-indicator">[OK]</span></div>
-      <div class="boot-message">&gt; Mounting file systems... <span class="ok-indicator">[OK]</span></div>
-      <div class="boot-message">&gt; System ready. Starting application...</div>
+      <div class="boot-message">■ INITIALIZING SYSTEM MODULES... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ LOADING UI COMPONENTS... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ CHECKING SYSTEM RESOURCES... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ ESTABLISHING CONNECTIONS... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ MOUNTING FILE SYSTEMS... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ LOADING GAME ENGINE... <span class="ok-indicator">[OK]</span></div>
+      <div class="boot-message">■ SYSTEM READY. PRESS START...</div>
     </div>
   </div>
+  
+  <div class="insert-coin">*** INSERT COIN ***</div>
 
   <script>
     // Animate percentage counter
     let currentPercentage = 0;
     const percentageElement = document.getElementById('percentage');
-    const duration = 2500; // Match with loading animation duration
+    const duration = 5500; // Match with loading animation duration
     const steps = 100;
     const intervalTime = duration / steps;
 

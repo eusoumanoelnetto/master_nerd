@@ -22,14 +22,14 @@ function createSplashWindow() {
   splashWindow.loadFile(path.join(__dirname, 'src', 'splash.html'));
   splashWindow.center();
 
-  // Após 3 segundos, cria a janela principal e fecha o splash
+  // Após 6 segundos, cria a janela principal e fecha o splash
   setTimeout(() => {
     createWindow();
     if (splashWindow && !splashWindow.isDestroyed()) {
       splashWindow.close();
       splashWindow = null;
     }
-  }, 3000);
+  }, 6000);
 }
 
 function createWindow() {
