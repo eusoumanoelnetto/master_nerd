@@ -1,0 +1,522 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #00ff00;
+    --secondary: #ff00ff;
+    --dark: #0a0e27;
+    --darker: #050812;
+    --neon-blue: #00ffff;
+    --neon-yellow: #ffff00;
+}
+
+body {
+    background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+    color: var(--primary);
+    font-family: 'Orbitron', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Starfield Background */
+.stars {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.stars::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 100px 100px white, 200px 150px white, 150px 200px white, 
+                250px 50px white, 50px 250px white, 300px 300px white,
+                350px 100px white, 100px 350px white, 400px 200px white,
+                180px 400px white, 420px 150px white, 320px 380px white;
+    animation: twinkle 3s infinite;
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+}
+
+/* Navbar */
+.navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: rgba(5, 8, 18, 0.95);
+    border-bottom: 3px solid var(--primary);
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+}
+
+.logo {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.5rem;
+    color: var(--primary);
+    text-shadow: 0 0 10px var(--primary), 0 0 20px var(--secondary);
+    letter-spacing: 2px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    border: 2px solid var(--primary);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* Main Content */
+main {
+    margin-top: 80px;
+    position: relative;
+}
+
+/* Hero Section */
+.hero {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content {
+    text-align: center;
+    z-index: 2;
+}
+
+.hero h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 4rem;
+    color: var(--primary);
+    text-shadow: 0 0 20px var(--primary), 0 0 40px var(--secondary),
+                 0 0 60px var(--neon-blue);
+    margin-bottom: 1rem;
+    letter-spacing: 3px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+.glitch {
+    position: relative;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    animation: glitch-1 0.3s infinite;
+    color: var(--neon-blue);
+    z-index: -1;
+    text-shadow: -2px 0 var(--secondary);
+}
+
+.glitch::after {
+    animation: glitch-2 0.3s infinite;
+    color: var(--secondary);
+    z-index: -2;
+    text-shadow: 2px 0 var(--neon-blue);
+}
+
+@keyframes glitch-1 {
+    0% { clip-path: rect(0, 900px, 0, 0); }
+    100% { clip-path: rect(0, 900px, 900px, 0); }
+}
+
+@keyframes glitch-2 {
+    0% { clip-path: rect(0, 0, 900px, 0); }
+    100% { clip-path: rect(0, 0, 900px, 900px); }
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    color: var(--neon-blue);
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px var(--neon-blue);
+    letter-spacing: 2px;
+}
+
+.crt-effect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15) 0px,
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+}
+
+.cta-button {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    font-size: 1.2rem;
+    font-family: 'Press Start 2P', cursive;
+    color: var(--dark);
+    background: var(--primary);
+    border: 3px solid var(--primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.8);
+    margin-top: 2rem;
+}
+
+.cta-button:hover {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--primary);
+    box-shadow: 0 0 30px rgba(255, 0, 255, 1);
+    transform: scale(1.1);
+}
+
+/* Section Styling */
+section {
+    padding: 4rem 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 2.5rem;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 3rem;
+    text-shadow: 0 0 15px var(--primary);
+    border-bottom: 3px solid var(--secondary);
+    padding-bottom: 1rem;
+}
+
+/* Features Section */
+.features {
+    background: rgba(0, 255, 0, 0.05);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid var(--primary);
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+}
+
+.feature-card:hover {
+    background: rgba(255, 0, 255, 0.1);
+    border-color: var(--secondary);
+    box-shadow: 0 0 25px rgba(255, 0, 255, 0.6);
+    transform: translateY(-10px);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--neon-blue);
+}
+
+.feature-card p {
+    color: #aaa;
+    line-height: 1.6;
+}
+
+/* Download Section */
+.download {
+    background: rgba(0, 255, 255, 0.05);
+}
+
+.download-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+.download-box,
+.github-box {
+    background: rgba(0, 255, 0, 0.1);
+    border: 3px solid var(--primary);
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    transition: all 0.3s;
+}
+
+.github-box {
+    border-color: var(--secondary);
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.4);
+}
+
+.download-box:hover,
+.github-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.8);
+}
+
+.download-box h3,
+.github-box h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary);
+}
+
+.system-req {
+    color: var(--neon-blue);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+.download-btn,
+.github-btn {
+    display: inline-block;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-family: 'Press Start 2P', cursive;
+    background: var(--primary);
+    color: var(--dark);
+    border: 2px solid var(--primary);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 1rem 0;
+}
+
+.github-btn {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    color: var(--primary);
+}
+
+.download-btn:hover {
+    background: transparent;
+    color: var(--primary);
+    box-shadow: 0 0 20px var(--primary);
+}
+
+.github-btn:hover {
+    background: transparent;
+    color: var(--secondary);
+    box-shadow: 0 0 20px var(--secondary);
+}
+
+.download-info {
+    color: #888;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+}
+
+/* About Section */
+.about {
+    background: rgba(255, 0, 255, 0.05);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: center;
+}
+
+.about-text h3 {
+    font-size: 1.3rem;
+    color: var(--neon-blue);
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.about-text p {
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 1rem;
+}
+
+.tech-list,
+.usage-list {
+    list-style: none;
+    color: #aaa;
+    line-height: 2;
+}
+
+.tech-list li,
+.usage-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+}
+
+.usage-list {
+    counter-reset: item;
+}
+
+.usage-list li {
+    counter-increment: item;
+    position: relative;
+}
+
+.usage-list li::before {
+    content: counter(item);
+    position: absolute;
+    left: 0;
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* Monitor Mockup */
+.monitor-mockup {
+    perspective: 1000px;
+    display: flex;
+    justify-content: center;
+}
+
+.monitor-screen {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: linear-gradient(135deg, #00ff00, #00ffff);
+    border: 15px solid #333;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    color: #000;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                inset 0 0 20px rgba(0, 0, 0, 0.3);
+    transform: rotateX(10deg);
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.2) 0px,
+        rgba(0, 0, 0, 0.2) 2px,
+        transparent 2px,
+        transparent 4px
+    );
+    pointer-events: none;
+}
+
+/* Footer */
+footer {
+    background: rgba(0, 0, 0, 0.5);
+    border-top: 3px solid var(--primary);
+    padding: 2rem;
+    text-align: center;
+    color: #888;
+}
+
+footer p {
+    margin-bottom: 1rem;
+}
+
+footer a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+footer a:hover {
+    color: var(--secondary);
+    text-shadow: 0 0 10px var(--secondary);
+}
+
+.social-links {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.8rem;
+    }
+
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1rem;
+    }
+
+    .download-container,
+    .about-content {
+        grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+
+    section {
+        padding: 2rem 1rem;
+    }
+}
