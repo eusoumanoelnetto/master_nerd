@@ -1,0 +1,2 @@
+# Ignore dependencies installed via npm
+node_modules/
