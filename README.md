@@ -5,51 +5,51 @@
 [![Electron](https://img.shields.io/badge/Electron-v27-9feaf9?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 
-Aplicação desktop com estética retrô arcade. Uma experiência nostálgica de computação dos anos 80/90.
+Aplicaï¿½ï¿½o desktop com estï¿½tica retrï¿½ arcade. Uma experiï¿½ncia nostï¿½lgica de computaï¿½ï¿½o dos anos 80/90.
 
-##  Características
+##  Caracterï¿½sticas
 
--  **Interface Retrô**: Design autêntico em estilo arcade com efeitos CRT e neon
--  **Construído em Electron**: Aplicação desktop multiplataforma
--  **Temas Customizados**: Efeitos visuais imersivos e animações fluidas
--  **Portável**: Executável standalone sem dependências externas
--  **Code Open Source**: Código fonte completo e documentado
+-  **Interface Retrï¿½**: Design autï¿½ntico em estilo arcade com efeitos CRT e neon
+-  **Construï¿½do em Electron**: Aplicaï¿½ï¿½o desktop multiplataforma
+-  **Temas Customizados**: Efeitos visuais imersivos e animaï¿½ï¿½es fluidas
+-  **Portï¿½vel**: Executï¿½vel standalone sem dependï¿½ncias externas
+-  **Code Open Source**: Cï¿½digo fonte completo e documentado
 
 ##  Como Usar
 
-### Usuários Finais
+### Usuï¿½rios Finais
 
-1. **Download da Versão Executável**
+1. **Download da Versï¿½o Executï¿½vel**
    - Acesse [GitHub Releases](https://github.com/master-nerd/master-nerd/releases)
-   - Baixe o arquivo \Master-Nerd-Setup.exe\ ou \Master-Nerd.exe\ (versão portável)
-   - Execute o instalador ou abra o executável portável diretamente
+   - Baixe o arquivo \Master-Nerd-Setup.exe\ ou \Master-Nerd.exe\ (versï¿½o portï¿½vel)
+   - Execute o instalador ou abra o executï¿½vel portï¿½vel diretamente
 
-2. **Configuração Rápida**
-   - Não requer instalação adicional
-   - Compatível com Windows 7 e superior
-   - Todas as dependências incluídas no executável
+2. **Configuraï¿½ï¿½o Rï¿½pida**
+   - Nï¿½o requer instalaï¿½ï¿½o adicional
+   - Compatï¿½vel com Windows 7 e superior
+   - Todas as dependï¿½ncias incluï¿½das no executï¿½vel
 
 ### Desenvolvedores
 
-#### Pré-requisitos
+#### Prï¿½-requisitos
 
 - Node.js 18+ ([Download](https://nodejs.org/))
 - npm ou yarn
 
-#### Instalação e Execução
+#### Instalaï¿½ï¿½o e Execuï¿½ï¿½o
 
 \\\ash
-# Clone o repositório
+# Clone o repositï¿½rio
 git clone https://github.com/master-nerd/master-nerd.git
 cd master-nerd/master
 
-# Instale as dependências
+# Instale as dependï¿½ncias
 npm install
 
 # Execute em modo desenvolvimento
 npm start
 
-# Build da aplicação para release
+# Build da aplicaï¿½ï¿½o para release
 npm run build
 \\\
 
@@ -59,10 +59,10 @@ npm run build
 master-nerd/
  master/
     main.js              # Processo principal do Electron
-    preload.js           # Script de pré-carregamento de segurança
-    package.json         # Configuração e dependências
+    preload.js           # Script de prï¿½-carregamento de seguranï¿½a
+    package.json         # Configuraï¿½ï¿½o e dependï¿½ncias
     src/
-       app.js           # Lógica da aplicação
+       app.js           # Lï¿½gica da aplicaï¿½ï¿½o
        index.html       # Interface principal
        styles.css       # Estilos globais
     ui/
@@ -86,41 +86,41 @@ master-nerd/
 
 ##  Stack de Tecnologias
 
-| Tecnologia | Versão | Propósito |
+| Tecnologia | Versï¿½o | Propï¿½sito |
 |-----------|--------|----------|
 | Electron | ^27.0.0 | Framework desktop |
 | Node.js | 18+ | Runtime JavaScript |
 | electron-builder | ^24.6.4 | Build e packaging |
 | HTML5 | - | Interface |
-| CSS3 | - | Estilos e animações |
-| JavaScript | ES6+ | Lógica da aplicação |
+| CSS3 | - | Estilos e animaï¿½ï¿½es |
+| JavaScript | ES6+ | Lï¿½gica da aplicaï¿½ï¿½o |
 
 ##  Recursos Visuais
 
-- **Efeitos CRT**: Reproduz a aparência autêntica de monitores de tubo de raios catódicos
-- **Neon Glow**: Efeitos de iluminação neon nos elementos da interface
-- **Glitch Effects**: Animações de distorção retrô
-- **Scanlines**: Linhas de varredura típicas de displays antigos
+- **Efeitos CRT**: Reproduz a aparï¿½ncia autï¿½ntica de monitores de tubo de raios catï¿½dicos
+- **Neon Glow**: Efeitos de iluminaï¿½ï¿½o neon nos elementos da interface
+- **Glitch Effects**: Animaï¿½ï¿½es de distorï¿½ï¿½o retrï¿½
+- **Scanlines**: Linhas de varredura tï¿½picas de displays antigos
 - **Star Field**: Campo de estrelas em paralaxe como screensaver
 
 ##  Requisitos do Sistema
 
 - **SO**: Windows 7 ou superior / macOS 10.11+ / Linux (AppImage)
 - **Processador**: Pentium IV 2.0 GHz ou superior
-- **RAM**: 512 MB mínimo (1 GB recomendado)
-- **Espaço em Disco**: 150 MB disponível
-- **Resolução**: 1024x768 ou superior
+- **RAM**: 512 MB mï¿½nimo (1 GB recomendado)
+- **Espaï¿½o em Disco**: 150 MB disponï¿½vel
+- **Resoluï¿½ï¿½o**: 1024x768 ou superior
 
-##  Configuração para Desenvolvimento
+##  Configuraï¿½ï¿½o para Desenvolvimento
 
 ### Setup Visual Studio Code
 
-1. Instale as extensões recomendadas:
+1. Instale as extensï¿½es recomendadas:
    - ESLint
    - Prettier
    - Electron DevTools
 
-2. Configure o lançador (\.vscode/launch.json\):
+2. Configure o lanï¿½ador (\.vscode/launch.json\):
 
 \\\json
 {
@@ -138,22 +138,22 @@ master-nerd/
 }
 \\\
 
-### Comandos Úteis
+### Comandos ï¿½teis
 
 \\\ash
 # Desenvolvimento com hot reload
 npm start
 
-# Build executável Windows
+# Build executï¿½vel Windows
 npm run build
 
-# Build portável
+# Build portï¿½vel
 npm run build -- --win portable
 
 # Build installer
 npm run build -- --win nsis
 
-# Lint do código
+# Lint do cï¿½digo
 npm run lint
 
 # Testes
@@ -162,52 +162,54 @@ npm test
 
 ## Troubleshooting
 
-### Aplicação não inicia
+### Aplicaï¿½ï¿½o nï¿½o inicia
 
-- Verifique se Node.js está instalado: \
+- Verifique se Node.js estï¿½ instalado: \
 ode --version\
-- Reinstale dependências: \m -r node_modules && npm install\
-- Verifique portas em uso: a aplicação pode usar porta 3000
+- Reinstale dependï¿½ncias: \
+m -r node_modules && npm install\
+- Verifique portas em uso: a aplicaï¿½ï¿½o pode usar porta 3000
 
 ### Problemas de compatibilidade
 
-- Atualize para a versão mais recente do Electron
-- Verifique se você atende aos requisitos mínimos do sistema
-- Tente desabilitar aceleração de hardware: \--no-gpu\
+- Atualize para a versï¿½o mais recente do Electron
+- Verifique se vocï¿½ atende aos requisitos mï¿½nimos do sistema
+- Tente desabilitar aceleraï¿½ï¿½o de hardware: \--no-gpu\
 
 ### Build falhando
 
 - Limpe cache: \
 pm cache clean --force\
-- Remova node_modules: \m -r node_modules\
+- Remova node_modules: \
+m -r node_modules\
 - Reinstale tudo: \
 pm install && npm run build\
 
-## Licença
+## Licenï¿½a
 
-Este projeto está licenciado sob a MIT License. Veja [LICENSE](LICENSE) para mais detalhes.
+Este projeto estï¿½ licenciado sob a MIT License. Veja [LICENSE](LICENSE) para mais detalhes.
 
 ## Contribuindo
 
-Contribuições são bem-vindas! Por favor:
+Contribuiï¿½ï¿½es sï¿½o bem-vindas! Por favor:
 
-1. Faça um Fork do projeto
+1. Faï¿½a um Fork do projeto
 2. Crie uma branch para sua feature (\git checkout -b feature/AmazingFeature\)
-3. Commit suas mudanças (\git commit -m \Add some AmazingFeature\\)
+3. Commit suas mudanï¿½as (\git commit -m \Add some AmazingFeature\\)
 4. Push para a branch (\git push origin feature/AmazingFeature\)
 5. Abra um Pull Request
 
 ## Contato & Suporte
 
 - **Issues**: [GitHub Issues](https://github.com/master-nerd/master-nerd/issues)
-- **Discussões**: [GitHub Discussions](https://github.com/master-nerd/master-nerd/discussions)
+- **Discussï¿½es**: [GitHub Discussions](https://github.com/master-nerd/master-nerd/discussions)
 
 ## Agradecimentos
 
 - Comunidade Electron
-- Inspiração em interfaces retrô clássicas
+- Inspiraï¿½ï¿½o em interfaces retrï¿½ clï¿½ssicas
 - Todos os contribuidores
 
 ---
 
-Desenvolvido com para entusiastas de tecnologia retrô
+Desenvolvido com para entusiastas de tecnologia retrï¿½
