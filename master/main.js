@@ -3,11 +3,40 @@ const path = require('path');
 const { execFile } = require('child_process');
 
 let mainWindow;
+let splashWindow;
+
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 600,
+    height: 400,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    webPreferences: {
+      nodeIntegration: false,
+      contextIsolation: true
+    }
+  });
+
+  splashWindow.loadFile(path.join(__dirname, 'src', 'splash.html'));
+  splashWindow.center();
+
+  // Após 3 segundos, cria a janela principal e fecha o splash
+  setTimeout(() => {
+    createWindow();
+    if (splashWindow && !splashWindow.isDestroyed()) {
+      splashWindow.close();
+      splashWindow = null;
+    }
+  }, 3000);
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 700,
     height: 900,
+    show: false, // Não mostrar até estar pronto
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -16,6 +45,12 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
+  
+  // Mostrar janela quando estiver pronta
+  mainWindow.once('ready-to-show', () => {
+    mainWindow.show();
+  });
+
   // Abra o DevTools apenas em ambiente de desenvolvimento ou quando solicitado
   const shouldOpenDevTools = process.env.NODE_ENV === 'development' || process.argv.includes('--devtools');
   if (shouldOpenDevTools) {
@@ -28,7 +63,7 @@ function createWindow() {
   });
 }
 
-app.on('ready', createWindow);
+app.on('ready', createSplashWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
