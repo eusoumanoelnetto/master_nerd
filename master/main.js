@@ -182,8 +182,8 @@ ipcMain.handle('launch-script', async (_event, scriptName, payload = {}) => {
       throw new Error(`Ação desconhecida: ${action}`);
     }
     case 'microsoft-activation': {
-      const ps = "Start-Process -FilePath 'powershell.exe' -Verb RunAs -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-Command','irm https://get.activated.win | iex'";
-      return runCommand('powershell.exe', ['-NoProfile', '-Command', ps]);
+      const cmd = 'irm https://get.activated.win | iex';
+      return runCommand('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd]);
     }
     default:
       throw new Error(`Script desconhecido: ${scriptName}`);

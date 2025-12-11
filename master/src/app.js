@@ -164,17 +164,48 @@ class MasterNerdApp {
       return;
     }
 
+    this.renderActivationScreen();
+    
     try {
-      await this.electronAPI.launchScript('microsoft-activation');
-      alert('Comando enviado em modo administrador. Aguarde a janela do PowerShell.');
+      const result = await this.electronAPI.launchScript('microsoft-activation');
+      const output = (result?.stdout || '') + (result?.stderr || '');
+      this.showActivationResult(output || 'Comando executado com sucesso.');
     } catch (err) {
       const details = [err?.message, err?.stderr, err?.stdout]
         .filter(Boolean)
         .map((part) => String(part).trim())
         .filter(Boolean)
         .join('\n');
-      alert(`Erro: ${details || 'Falha ao executar o comando.'}`);
+      this.showActivationResult(`ERRO:\n${details || 'Falha ao executar o comando.'}`);
       console.error('Erro Microsoft Activation:', err);
+    }
+  }
+
+  renderActivationScreen() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">MICROSOFT ACTIVATION</div>
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+        <div id="activation-output" style="flex: 1; overflow-y: auto; margin: 20px 0; padding: 15px; border: 2px solid var(--neon-cyan); background: rgba(0,0,0,0.5); font-size: 0.7rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; color: var(--neon-cyan);">Executando comando...</div>
+        <div style="margin-top: 20px;">
+          <button id="btn-back-activation" class="btn" style="color: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); padding: 8px 15px; font-size: 0.7rem;">Voltar</button>
+        </div>
+      </div>
+    `;
+    
+    document.getElementById('btn-back-activation').addEventListener('click', () => {
+      this.renderMenuScreen();
+    });
+  }
+
+  showActivationResult(output) {
+    const outputEl = document.getElementById('activation-output');
+    if (outputEl) {
+      outputEl.textContent = output;
+      outputEl.scrollTop = outputEl.scrollHeight;
     }
   }
 
