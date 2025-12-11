@@ -182,7 +182,7 @@ ipcMain.handle('launch-script', async (_event, scriptName, payload = {}) => {
       throw new Error(`Ação desconhecida: ${action}`);
     }
     case 'microsoft-activation': {
-      const cmd = 'irm https://get.activated.win | iex';
+      const cmd = '(irm https://get.activated.win | iex) *>&1';
       return runCommand('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', cmd]);
     }
     default:
