@@ -1,0 +1,25 @@
+appId: com.masternerd.app
+productName: Master Nerd
+files:
+  - main.js
+  - preload.js
+  - src/**/*
+  - node_modules/**/*
+
+publish: null
+
+win:
+  certificateFile: null
+  certificatePassword: null
+  signingHashAlgorithms: null
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
