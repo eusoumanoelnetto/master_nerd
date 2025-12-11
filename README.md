@@ -1,75 +1,39 @@
-#  Master Nerd
+# Master Nerd
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/master-nerd/master-nerd?style=flat-square)](https://github.com/master-nerd/master-nerd)
+[![GitHub Stars](https://img.shields.io/github/stars/eusoumanoelnetto/master_nerd?style=flat-square)](https://github.com/eusoumanoelnetto/master_nerd)
 [![Electron](https://img.shields.io/badge/Electron-v27-9feaf9?style=flat-square&logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
 
-Aplica��o desktop com est�tica retr� arcade. Uma experi�ncia nost�lgica de computa��o dos anos 80/90.
+Aplicação desktop com estética retrô arcade. Uma experiência nostálgica de computação dos anos 80/90.
 
-##  Caracter�sticas
+## Características
 
--  **Interface Retr�**: Design aut�ntico em estilo arcade com efeitos CRT e neon
--  **Constru�do em Electron**: Aplica��o desktop multiplataforma
--  **Temas Customizados**: Efeitos visuais imersivos e anima��es fluidas
--  **Port�vel**: Execut�vel standalone sem depend�ncias externas
--  **Code Open Source**: C�digo fonte completo e documentado
+- **Interface Retrô**: Design autêntico em estilo arcade com efeitos CRT e neon
+- **Construído em Electron**: Aplicação desktop multiplataforma
+- **Temas Customizados**: Efeitos visuais imersivos e animações fluidas
+- **Portável**: Executável standalone sem dependências externas
+- **Código Open Source**: Código completo e documentado
 
-##  Como Usar
+## Como Usar
 
-### Usu�rios Finais
+### Usuários finais
 
-1. **Download da Vers�o Execut�vel**
-   - Acesse [GitHub Releases](https://github.com/master-nerd/master-nerd/releases)
-   - Baixe o arquivo \Master-Nerd-Setup.exe\ ou \Master-Nerd.exe\ (vers�o port�vel)
-   - Execute o instalador ou abra o execut�vel port�vel diretamente
+1. **Download da versão executável**
+   - Acesse os [Releases no GitHub](https://github.com/eusoumanoelnetto/master_nerd/releases)
+   - Baixe `Master Nerd.exe` (versão portátil)
+   - Execute diretamente (não requer instalação)
 
-2. **Configura��o R�pida**
-   - N�o requer instala��o adicional
-   - Compat�vel com Windows 7 e superior
-   - Todas as depend�ncias inclu�das no execut�vel
+2. **Configuração rápida**
+   - Não requer instalação adicional
+   - Compatível com Windows 10+ (64-bit)
+   - Todas as dependências incluídas no executável
 
 ### Desenvolvedores
 
-#### Pr�-requisitos
+#### Pré-requisitos
 
-- Node.js 18+ ([Download](https://nodejs.org/))
-- npm ou yarn
-
-#### Instala��o e Execu��o
-
-\\\ash
-# Clone o reposit�rio
-git clone https://github.com/master-nerd/master-nerd.git
-cd master-nerd/master
-
-# Instale as depend�ncias
-npm install
-
-# Execute em modo desenvolvimento
-npm start
-
-# Build da aplica��o para release
-npm run build
-\\\
-
-#### Estrutura do Projeto
-
-\\\	ext
-master-nerd/
- master/
-    main.js              # Processo principal do Electron
-    preload.js           # Script de pr�-carregamento de seguran�a
-    package.json         # Configura��o e depend�ncias
-    src/
-       app.js           # L�gica da aplica��o
-       index.html       # Interface principal
-       styles.css       # Estilos globais
-    ui/
-       crtEffects.js    # Efeitos de monitor CRT
-       menuScreen.js    # Tela de menu
-       startScreen.js   # Tela inicial
-    scripts/
+Desenvolvido para entusiastas de tecnologia retrô.
         bootable_pendrive.ps1
         format_pendrive.ps1
         mas_activation.ps1
