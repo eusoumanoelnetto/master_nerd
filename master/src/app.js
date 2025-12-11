@@ -150,7 +150,27 @@ class MasterNerdApp {
       return;
     }
 
+    if (index === 1) {
+      await this.runMicrosoftActivation();
+      return;
+    }
+
     alert(`Launching: ${this.missions[index]?.label || 'Em breve'}`);
+  }
+
+  async runMicrosoftActivation() {
+    if (!this.electronAPI?.launchScript) {
+      alert('API indisponível. Reinicie o aplicativo.');
+      return;
+    }
+
+    try {
+      await this.electronAPI.launchScript('microsoft-activation');
+      alert('Comando enviado em modo administrador. Aguarde a janela do PowerShell.');
+    } catch (err) {
+      const message = err?.message || err?.error || 'Falha ao executar o comando.';
+      alert(`Erro: ${message}`);
+    }
   }
 
   renderFormatPendriveScreen(options = {}) {
