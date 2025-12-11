@@ -1,0 +1,42 @@
+name: Publish Release (Windows)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: master
+        run: |
+          npm ci
+
+      - name: Build (electron-builder)
+        working-directory: master
+        run: |
+          npm run build
+
+      - name: List dist files
+        run: |
+          Get-ChildItem -Recurse master/dist | Format-Table -AutoSize
+
+      - name: Create GitHub Release and upload artifact
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            master/dist/**/Master Nerd.exe
+            master/dist/*.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
