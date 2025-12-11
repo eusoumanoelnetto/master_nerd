@@ -37,6 +37,6 @@ Cole o valor `Hash` na seção de release.
 ## Download direto
 
 O botão do GitHub Pages aponta para:
-[Baixar executável](https://github.com/eusoumanoelnetto/master_nerd/releases/latest/download/Master%20Nerd.exe)
+[Baixar executável](https://github.com/eusoumanoelnetto/master_nerd/releases/latest/download/Master.Nerd.exe)
 
 Certifique-se de que o asset no release tem exatamente o nome `Master Nerd.exe`.
