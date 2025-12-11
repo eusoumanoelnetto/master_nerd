@@ -16,6 +16,7 @@
   "build": {
     "appId": "com.masternerd.app",
     "productName": "Master Nerd",
+    "artifactName": "Master Nerd.${ext}",
     "files": [
       "main.js",
       "preload.js",
@@ -23,6 +24,7 @@
       "node_modules/**/*"
     ],
     "win": {
+      "artifactName": "Master Nerd.${ext}",
       "target": [
         {
           "target": "nsis",
