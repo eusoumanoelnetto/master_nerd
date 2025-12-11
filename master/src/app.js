@@ -168,8 +168,13 @@ class MasterNerdApp {
       await this.electronAPI.launchScript('microsoft-activation');
       alert('Comando enviado em modo administrador. Aguarde a janela do PowerShell.');
     } catch (err) {
-      const message = err?.message || err?.error || 'Falha ao executar o comando.';
-      alert(`Erro: ${message}`);
+      const details = [err?.message, err?.stderr, err?.stdout]
+        .filter(Boolean)
+        .map((part) => String(part).trim())
+        .filter(Boolean)
+        .join('\n');
+      alert(`Erro: ${details || 'Falha ao executar o comando.'}`);
+      console.error('Erro Microsoft Activation:', err);
     }
   }
 

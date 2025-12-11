@@ -85,7 +85,10 @@ ipcMain.handle('launch-script', async (_event, scriptName, payload = {}) => {
   const runCommand = (cmd, args) => new Promise((resolve, reject) => {
     execFile(cmd, args, { windowsHide: true }, (error, stdout, stderr) => {
       if (error) {
-        return reject({ error: error.message, stdout, stderr });
+        const err = new Error((stderr || error.message || 'Falha ao executar comando').trim());
+        err.stdout = stdout;
+        err.stderr = stderr;
+        return reject(err);
       }
       resolve({ stdout, stderr });
     });
