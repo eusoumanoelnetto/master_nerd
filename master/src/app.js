@@ -818,7 +818,7 @@ class MasterNerdApp {
 
     const trimmedLabel = userInput.trim().slice(0, 32);
     if (!trimmedLabel) {
-      alert('Nome inválido. Operação cancelada.');
+      this.showModal('Nome inválido. Operação cancelada.');
       return;
     }
 
@@ -1040,7 +1040,7 @@ class MasterNerdApp {
         statusEl.textContent = 'Selecione um disco antes de formatar.';
         statusEl.classList.add('error');
       }
-      alert('Nenhum disco foi selecionado para formatação.');
+      this.showModal('Nenhum disco foi selecionado para formatação.');
       return;
     }
 
@@ -1053,7 +1053,7 @@ class MasterNerdApp {
         statusEl.textContent = 'Ative o modo Admin para formatar a partição.';
         statusEl.classList.add('error');
       }
-      alert('É necessário executar como Administrador para formatar.');
+      this.showModal('É necessário executar como Administrador para formatar.');
       return;
     }
 
@@ -1236,7 +1236,7 @@ class MasterNerdApp {
 
   async requestElevation() {
     if (!this.electronAPI?.elevateApp) {
-      alert('Elevação automática não suportada neste ambiente. Execute manualmente como Administrador.');
+      this.showModal('Elevação automática não suportada neste ambiente. Execute manualmente como Administrador.');
       return;
     }
 
