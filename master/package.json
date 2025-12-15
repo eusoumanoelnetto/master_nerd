@@ -1,6 +1,6 @@
 {
   "name": "master-nerd",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Retro arcade CRT desktop app for the Master Nerd toolkit.",
   "main": "main.js",
   "scripts": {
