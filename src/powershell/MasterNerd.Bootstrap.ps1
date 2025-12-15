@@ -703,7 +703,34 @@ function Invoke-Menu {
     $options = @(
         @{ Key = '1'; Name = 'Formatar Pendrive'; Handler = { Invoke-UsbFormatWizard } },
         @{ Key = '2'; Name = 'Microsoft-Activation-Scripts'; Handler = { 
-            Write-Host "[>] Executando Microsoft-Activation-Scripts..." -ForegroundColor Yellow
+            # Garante privilégio; se não estiver em Admin, oferece relançar o próprio script em modo elevado
+            if (-not (Test-IsAdmin)) {
+                Write-Host "[!] Esta opção requer modo Administrador." -ForegroundColor Yellow
+                $elevate = Read-Host "Reiniciar o Master Nerd em modo Admin agora? (S/N)"
+                if ($elevate -match '^[sS]$') {
+                    $scriptPath = if ($PSCommandPath) { $PSCommandPath } else { $MyInvocation.MyCommand.Path }
+                    if (-not $scriptPath) {
+                        Write-Warning "Não foi possível determinar o caminho do script atual. Abra manualmente como Administrador."
+                        return
+                    }
+
+                    if ([IO.Path]::GetExtension($scriptPath) -ieq '.ps1') {
+                        $args = @('-NoProfile','-ExecutionPolicy','Bypass','-File', $scriptPath)
+                        Start-Process -FilePath "powershell.exe" -ArgumentList $args -Verb RunAs | Out-Null
+                    } else {
+                        # Provavelmente estamos rodando via EXE empacotado
+                        Start-Process -FilePath $scriptPath -Verb RunAs | Out-Null
+                    }
+
+                    $script:SkipFinalClear = $true
+                    exit
+                } else {
+                    Write-Warning "Operação cancelada. Execute em modo Admin para usar esta opção."
+                    return
+                }
+            }
+
+            Write-Host "[>] Executando Microsoft-Activation-Scripts no console atual..." -ForegroundColor Yellow
             Write-Host ""
             irm https://get.activated.win | iex
         } },

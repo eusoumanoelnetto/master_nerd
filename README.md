@@ -48,132 +48,132 @@ Desenvolvido para entusiastas de tecnologia retrô.
      script.js
 \\\
 
-##  Stack de Tecnologias
+## 📦 Stack de Tecnologias
 
-| Tecnologia | Vers�o | Prop�sito |
+| Tecnologia | Versão | Propósito |
 |-----------|--------|----------|
 | Electron | ^27.0.0 | Framework desktop |
 | Node.js | 18+ | Runtime JavaScript |
 | electron-builder | ^24.6.4 | Build e packaging |
 | HTML5 | - | Interface |
-| CSS3 | - | Estilos e anima��es |
-| JavaScript | ES6+ | L�gica da aplica��o |
+| CSS3 | - | Estilos e animações |
+| JavaScript | ES6+ | Lógica da aplicação |
 
-##  Recursos Visuais
+## 🎨 Recursos Visuais
 
-- **Efeitos CRT**: Reproduz a apar�ncia aut�ntica de monitores de tubo de raios cat�dicos
-- **Neon Glow**: Efeitos de ilumina��o neon nos elementos da interface
-- **Glitch Effects**: Anima��es de distor��o retr�
-- **Scanlines**: Linhas de varredura t�picas de displays antigos
+- **Efeitos CRT**: Reproduz a aparência autêntica de monitores de tubo de raios catódicos
+- **Neon Glow**: Efeitos de iluminação neon nos elementos da interface
+- **Glitch Effects**: Animações de distorção retrô
+- **Scanlines**: Linhas de varredura típicas de displays antigos
 - **Star Field**: Campo de estrelas em paralaxe como screensaver
 
-##  Requisitos do Sistema
+## 💻 Requisitos do Sistema
 
 - **SO**: Windows 7 ou superior / macOS 10.11+ / Linux (AppImage)
 - **Processador**: Pentium IV 2.0 GHz ou superior
-- **RAM**: 512 MB m�nimo (1 GB recomendado)
-- **Espa�o em Disco**: 150 MB dispon�vel
-- **Resolu��o**: 1024x768 ou superior
+- **RAM**: 512 MB mínimo (1 GB recomendado)
+- **Espaço em Disco**: 150 MB disponível
+- **Resolução**: 1024x768 ou superior
 
-##  Configura��o para Desenvolvimento
+## ⚙️ Configuração para Desenvolvimento
 
 ### Setup Visual Studio Code
 
-1. Instale as extens�es recomendadas:
+1. Instale as extensões recomendadas:
    - ESLint
    - Prettier
    - Electron DevTools
 
-2. Configure o lan�ador (\.vscode/launch.json\):
+2. Configure o lançador (`.vscode/launch.json`):
 
-\\\json
+```json
 {
-  " version\: \0.2.0\,
- \configurations\: [
- {
- \name\: \Electron\,
- \type\: \node\,
- \request\: \launch\,
- \program\: \\/master/main.js\,
- \restart\: true,
- \console\: \integratedTerminal\
- }
- ]
+   "version": "0.2.0",
+   "configurations": [
+      {
+         "name": "Electron",
+         "type": "node",
+         "request": "launch",
+         "program": "${workspaceFolder}/master/main.js",
+         "restart": true,
+         "console": "integratedTerminal"
+      }
+   ]
 }
-\\\
+```
 
-### Comandos �teis
+### Comandos Úteis
 
-\\\ash
+```bash
 # Desenvolvimento com hot reload
 npm start
 
-# Build execut�vel Windows
+# Build executável Windows
 npm run build
 
-# Build port�vel
+# Build portátil
 npm run build -- --win portable
 
 # Build installer
 npm run build -- --win nsis
 
-# Lint do c�digo
+# Lint do código
 npm run lint
 
 # Testes
 npm test
-\\\
+```
 
 ## Troubleshooting
 
-### Aplica��o n�o inicia
-
-- Verifique se Node.js est� instalado: \
 ode --version\
-- Reinstale depend�ncias: \
 m -r node_modules && npm install\
-- Verifique portas em uso: a aplica��o pode usar porta 3000
+### Aplicação não inicia
+
+- Verifique se Node.js está instalado: `node --version`
+- Reinstale dependências: `rm -r node_modules && npm install`
+- Verifique portas em uso: a aplicação pode usar porta 3000
 
 ### Problemas de compatibilidade
 
-- Atualize para a vers�o mais recente do Electron
-- Verifique se voc� atende aos requisitos m�nimos do sistema
-- Tente desabilitar acelera��o de hardware: \--no-gpu\
+- Atualize para a versão mais recente do Electron
+- Verifique se você atende aos requisitos mínimos do sistema
+- Tente desabilitar aceleração de hardware: `--no-gpu`
 
 ### Build falhando
 
-- Limpe cache: \
 pm cache clean --force\
-- Remova node_modules: \
 m -r node_modules\
-- Reinstale tudo: \
 pm install && npm run build\
+- Limpe cache: `npm cache clean --force`
+- Remova node_modules: `rm -r node_modules`
+- Reinstale tudo: `npm install && npm run build`
 
-## Licen�a
+## 📄 Licença
 
-Este projeto est� licenciado sob a MIT License. Veja [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a MIT License. Veja [LICENSE](LICENSE) para mais detalhes.
 
 ## Contribuindo
 
-Contribui��es s�o bem-vindas! Por favor:
+Contribuições são bem-vindas! Por favor:
 
-1. Fa�a um Fork do projeto
-2. Crie uma branch para sua feature (\git checkout -b feature/AmazingFeature\)
-3. Commit suas mudan�as (\git commit -m \Add some AmazingFeature\\)
-4. Push para a branch (\git push origin feature/AmazingFeature\)
+1. Faça um Fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
 
 ## Contato & Suporte
 
 - **Issues**: [GitHub Issues](https://github.com/master-nerd/master-nerd/issues)
-- **Discuss�es**: [GitHub Discussions](https://github.com/master-nerd/master-nerd/discussions)
+- **Discussões**: [GitHub Discussions](https://github.com/master-nerd/master-nerd/discussions)
 
 ## Agradecimentos
 
 - Comunidade Electron
-- Inspira��o em interfaces retr� cl�ssicas
+- Inspiração em interfaces retrô clássicas
 - Todos os contribuidores
 
 ---
 
-Desenvolvido com para entusiastas de tecnologia retr�
+Desenvolvido com ❤️ para entusiastas de tecnologia retrô
