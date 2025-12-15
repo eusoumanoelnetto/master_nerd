@@ -11,6 +11,35 @@ class MasterNerdApp {
     this.lastFormatInfo = null;
   }
 
+  showModal(message, title = 'MASTER NERD') {
+    const modal = document.createElement('div');
+    modal.className = 'custom-modal';
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">${title}</div>
+        <div class="modal-body">${message}</div>
+        <button class="modal-btn" id="modal-ok">OK</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const okBtn = document.getElementById('modal-ok');
+    okBtn.addEventListener('click', () => {
+      document.body.removeChild(modal);
+    });
+
+    okBtn.focus();
+
+    document.addEventListener('keydown', function escHandler(e) {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        if (document.body.contains(modal)) {
+          document.body.removeChild(modal);
+        }
+        document.removeEventListener('keydown', escHandler);
+      }
+    });
+  }
+
   init() {
     this.renderStartScreen();
   }
@@ -155,12 +184,17 @@ class MasterNerdApp {
       return;
     }
 
-    alert(`Launching: ${this.missions[index]?.label || 'Em breve'}`);
+    if (index === 2) {
+      this.renderExtrasMenu();
+      return;
+    }
+
+    this.showModal(`Launching: ${this.missions[index]?.label || 'Em breve'}`);
   }
 
   async runMicrosoftActivation() {
     if (!this.electronAPI?.launchScript) {
-      alert('API indisponível. Reinicie o aplicativo.');
+      this.showModal('API indisponível. Reinicie o aplicativo.');
       return;
     }
 
@@ -207,6 +241,220 @@ class MasterNerdApp {
       outputEl.textContent = output;
       outputEl.scrollTop = outputEl.scrollHeight;
     }
+  }
+
+  renderExtrasMenu() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">EXTRAS MENU</div>
+
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+
+        <div class="menu-items">
+          <button class="menu-item" id="btn-windows">Windows</button>
+          <button class="menu-item" id="btn-office">Office</button>
+          <button class="menu-item" id="btn-voltar-extras">Voltar</button>
+        </div>
+
+        <div class="prompt-text">SELECT YOUR OPTION</div>
+
+        <div style="margin-top: 30px; font-size: 0.8rem; color: #888;">
+          <button id="btn-exit-extras" class="btn" style="color: var(--neon-red); border-color: var(--neon-red); box-shadow: 0 0 10px var(--neon-red); padding: 8px 15px; font-size: 0.7rem;">EXIT</button>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('btn-windows').addEventListener('click', () => {
+      this.renderWindowsMenu();
+    });
+
+    document.getElementById('btn-office').addEventListener('click', () => {
+      this.renderOfficeMenu();
+    });
+
+    document.getElementById('btn-voltar-extras').addEventListener('click', () => {
+      this.renderMenuScreen();
+    });
+
+    document.getElementById('btn-exit-extras').addEventListener('click', () => {
+      window.close();
+    });
+  }
+
+  renderWindowsMenu() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">WINDOWS OPTIONS</div>
+
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+
+        <div class="menu-items" style="max-height: 50vh; overflow-y: auto; padding-bottom: 10px;">
+          <button class="menu-item" data-windows="11">Windows 11</button>
+          <button class="menu-item" data-windows="10">Windows 10</button>
+          <button class="menu-item" data-windows="10-11-ltsc">Windows 10 / 11 Enterprise LTSC</button>
+          <button class="menu-item" data-windows="arm64">Windows ARM64</button>
+          <button class="menu-item" data-windows="8.1">Windows 8.1</button>
+          <button class="menu-item" data-windows="8">Windows 8</button>
+          <button class="menu-item" data-windows="7">Windows 7</button>
+          <button class="menu-item" data-windows="vista">Windows Vista</button>
+          <button class="menu-item" data-windows="xp">Windows XP</button>
+          <button class="menu-item" data-windows="server">Windows Server</button>
+          <button class="menu-item" id="btn-voltar-windows">Voltar</button>
+        </div>
+
+        <div class="prompt-text" style="margin-top: 15px;">SELECT YOUR OPTION</div>
+      </div>
+    `;
+
+    document.querySelectorAll('[data-windows]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const version = btn.getAttribute('data-windows');
+        this.handleWindowsDownload(version);
+      });
+    });
+
+    document.getElementById('btn-voltar-windows').addEventListener('click', () => {
+      this.renderExtrasMenu();
+    });
+  }
+
+  handleWindowsDownload(version) {
+    const downloads = {
+      '11': 'https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_pt-br.iso',
+      '10-11-ltsc': 'https://delivery.activated.win/dbmassgrave/pt-br_windows_11_enterprise_ltsc_2024_x64_dvd_2bb6b75b.iso?t=vzrKMpcsvKJYyEAdmiELbkOcKqdKy5dR&P1=1765856811&P2=601&P3=2&P4=d7FovTkd%2F2PWSMh49Fs5prg1gtmlkyQo97mDjNw%2FOgM%3D',
+      'arm64': 'https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_A64FRE_pt-br.iso',
+      'xp': 'https://archive.isdn.network/windows/pt-br_windows_xp_professional_with_service_pack_3_x86_cd_vl_x14-74137.iso',
+      'server': 'https://delivery.massgrave.dev/dbmassgrave/pt-br_windows_server_2025_updated_nov_2025_x64_dvd_2cfcca22.iso?t=vzrKMpcsvKJYyEAdzkdMuZuHkHCbO7HO&P1=1765857289&P2=601&P3=2&P4=YHmFTid1w7HeXztJ2BQeji5H22%2FrA1fmeNaB4Iudo20%3D'
+    };
+
+    const multiArch = {
+      '10': {
+        x64: 'https://delivery.activated.win/dbmassgrave/pt-br_windows_10_consumer_editions_version_22h2_updated_oct_2025_x64_dvd_38efd00d.iso?t=vzrKMpcsvKJYyEAdKmUgHcwajc3NP3nZ&P1=1765856712&P2=601&P3=2&P4=Zl12LlLy%2F2v3PS3tXcR7KFAqUiNw5jNWmZcbwL0AFI0%3D',
+        x86: 'https://delivery.activated.win/dbmassgrave/pt-br_windows_10_consumer_editions_version_22h2_updated_oct_2025_x86_dvd_38efd00d.iso?t=vzrKMpcsvKJYyEAdDCFsw6ZbqxT7XOl2&P1=1765856753&P2=601&P3=2&P4=HAKQNkHRYd9mV9G%2BIbAbEz0h4o00crwKIHdcN4TwQiI%3D'
+      },
+      '8.1': {
+        x64: 'https://archive.isdn.network/windows/pt_windows_8.1_with_update_x64_dvd_6051496.iso',
+        x86: 'https://archive.isdn.network/windows/pt_windows_8.1_with_update_x86_dvd_6051647.iso'
+      },
+      '8': {
+        x64: 'https://archive.isdn.network/windows/pt_windows_8_x64_dvd_915416.iso',
+        x86: 'https://archive.isdn.network/windows/pt_windows_8_x86_dvd_915467.iso'
+      },
+      '7': {
+        x64: 'https://archive.isdn.network/windows/pt_windows_7_ultimate_with_sp1_x64_dvd_u_677358.iso',
+        x86: 'https://archive.isdn.network/windows/pt_windows_7_ultimate_with_sp1_x86_dvd_u_677457.iso'
+      },
+      'vista': {
+        x64: 'https://archive.isdn.network/windows/pt_windows_vista_with_sp2_x64_dvd_x15-36319.iso',
+        x86: 'https://archive.isdn.network/windows/pt_windows_vista_with_sp2_x86_dvd_x15-36283.iso'
+      }
+    };
+
+    // Versões com múltiplas arquiteturas - mostrar submenu
+    if (multiArch[version]) {
+      this.renderArchitectureMenu(version, multiArch[version]);
+    }
+    // Versões com download direto
+    else if (downloads[version]) {
+      this.startDownload(downloads[version]);
+    }
+    else {
+      this.showModal('Versão não encontrada');
+    }
+  }
+
+  renderArchitectureMenu(windowsVersion, urls) {
+    const app = document.getElementById('app');
+    const versionNames = {
+      '10': 'Windows 10',
+      '8.1': 'Windows 8.1',
+      '8': 'Windows 8',
+      '7': 'Windows 7',
+      'vista': 'Windows Vista'
+    };
+
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">${versionNames[windowsVersion] || windowsVersion}</div>
+
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+
+        <div class="menu-items">
+          <button class="menu-item" data-url="${urls.x64}">x64 (64-bit)</button>
+          <button class="menu-item" data-url="${urls.x86}">x86 (32-bit)</button>
+          <button class="menu-item" id="btn-voltar-arch">Voltar</button>
+        </div>
+
+        <div class="prompt-text">SELECT YOUR OPTION</div>
+      </div>
+    `;
+
+    document.querySelectorAll('[data-url]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-url');
+        this.startDownload(url);
+      });
+    });
+
+    document.getElementById('btn-voltar-arch').addEventListener('click', () => {
+      this.renderWindowsMenu();
+    });
+  }
+
+  startDownload(url) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = '';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    this.showModal('Download iniciado! Verifique a pasta de Downloads do seu navegador.');
+  }
+
+  renderOfficeMenu() {
+    const app = document.getElementById('app');
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">OFFICE OPTIONS</div>
+
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+
+        <div class="menu-items" style="max-height: 50vh; overflow-y: auto; padding-bottom: 10px;">
+          <button class="menu-item" data-office="365">Microsoft 365 / Sub</button>
+          <button class="menu-item" data-office="2024">Office 2024</button>
+          <button class="menu-item" data-office="2021">Office 2021</button>
+          <button class="menu-item" data-office="2019">Office 2019</button>
+          <button class="menu-item" data-office="2016">Office 2016</button>
+          <button class="menu-item" data-office="2013">Office 2013</button>
+          <button class="menu-item" id="btn-voltar-office">Voltar</button>
+        </div>
+
+        <div class="prompt-text" style="margin-top: 15px;">SELECT YOUR OPTION</div>
+      </div>
+    `;
+
+    document.querySelectorAll('[data-office]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const version = btn.getAttribute('data-office');
+        this.showModal(`Download/Instalação do ${btn.textContent} em breve...`);
+      });
+    });
+
+    document.getElementById('btn-voltar-office').addEventListener('click', () => {
+      this.renderExtrasMenu();
+    });
   }
 
   renderFormatPendriveScreen(options = {}) {
