@@ -16,34 +16,34 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
 
       - name: Install dependencies
-        working-directory: ./master-nerd
-        run: npm install
+        working-directory: ./master
+        run: npm ci
 
-      - name: Install pkg
-        run: npm install -g pkg
+      - name: Build EXE (electron-builder)
+        working-directory: ./master
+        run: npm run build
 
-      - name: Build EXE
-        working-directory: ./master-nerd
-        run: |
-          pkg masternerd.js `
-            --targets node18-win-x64 `
-            --output ../MasterNerd.exe `
-            --compress Brotli
+      - name: List dist files
+        run: Get-ChildItem -Recurse master/dist | Format-Table -AutoSize
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: MasterNerd.exe
+          files: |
+            master/dist/**/Master Nerd.exe
+            master/dist/*.exe
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: MasterNerd.exe
-          path: MasterNerd.exe
+          name: MasterNerd-build
+          path: |
+            master/dist/**/Master Nerd.exe
+            master/dist/*.exe
