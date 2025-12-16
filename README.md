@@ -50,7 +50,7 @@ Desenvolvido para entusiastas de tecnologia retrô.
      script.js
 \\\
 
-## 📦 Stack de Tecnologias
+## Stack de Tecnologias
 
 | Tecnologia | Versão | Propósito |
 |-----------|--------|----------|
@@ -61,7 +61,7 @@ Desenvolvido para entusiastas de tecnologia retrô.
 | CSS3 | - | Estilos e animações |
 | JavaScript | ES6+ | Lógica da aplicação |
 
-## 🎨 Recursos Visuais
+## Recursos Visuais
 
 - **Efeitos CRT**: Reproduz a aparência autêntica de monitores de tubo de raios catódicos
 - **Neon Glow**: Efeitos de iluminação neon nos elementos da interface
@@ -69,7 +69,7 @@ Desenvolvido para entusiastas de tecnologia retrô.
 - **Scanlines**: Linhas de varredura típicas de displays antigos
 - **Star Field**: Campo de estrelas em paralaxe como screensaver
 
-## 💻 Requisitos do Sistema
+## Requisitos do Sistema
 
 - **SO**: Windows 7 ou superior / macOS 10.11+ / Linux (AppImage)
 - **Processador**: Pentium IV 2.0 GHz ou superior
@@ -77,7 +77,7 @@ Desenvolvido para entusiastas de tecnologia retrô.
 - **Espaço em Disco**: 150 MB disponível
 - **Resolução**: 1024x768 ou superior
 
-## ⚙️ Configuração para Desenvolvimento
+## Configuração para Desenvolvimento
 
 ### Setup Visual Studio Code
 
@@ -128,8 +128,6 @@ npm test
 
 ## Troubleshooting
 
-ode --version\
-m -r node_modules && npm install\
 ### Aplicação não inicia
 
 - Verifique se Node.js está instalado: `node --version`
@@ -144,14 +142,11 @@ m -r node_modules && npm install\
 
 ### Build falhando
 
-pm cache clean --force\
-m -r node_modules\
-pm install && npm run build\
 - Limpe cache: `npm cache clean --force`
 - Remova node_modules: `rm -r node_modules`
 - Reinstale tudo: `npm install && npm run build`
 
-## 📄 Licença
+## Licença
 
 Este projeto está licenciado sob a MIT License. Veja [LICENSE](LICENSE) para mais detalhes.
 
