@@ -1,3 +1,5 @@
+![Master Nerd Banner](../src/banner.png)
+
 # Master Nerd Arcade CLI
 
 Retro arcade-inspired CRT console that launches Master Nerd automation scripts through a Node.js interface.
