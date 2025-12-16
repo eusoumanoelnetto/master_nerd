@@ -173,4 +173,4 @@ Contribuições são bem-vindas! Por favor:
 
 ---
 
-Desenvolvido com ❤️ e ☕ por [Manoel Coelho](https://linkedin.com/in/eusoumanoelnetto) para entusiastas de tecnologia retrô
+Desenvolvido com ❤️ e 🍵 por [Manoel Coelho](https://linkedin.com/in/eusoumanoelnetto) para entusiastas de tecnologia retrô
