@@ -453,12 +453,90 @@ class MasterNerdApp {
     document.querySelectorAll('[data-office]').forEach(btn => {
       btn.addEventListener('click', () => {
         const version = btn.getAttribute('data-office');
-        this.showModal(`Download/Instalação do ${btn.textContent} em breve...`);
+        const label = btn.textContent.trim();
+        this.handleOfficeSelection(version, label);
       });
     });
 
     document.getElementById('btn-voltar-office').addEventListener('click', () => {
       this.renderExtrasMenu();
+    });
+  }
+
+  handleOfficeSelection(version, labelText = 'Office') {
+    const officeDownloads = {
+      '365': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365EduCloudRetail&platform=x64&language=pt-br&version=O16GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=O365EduCloudRetail&platform=x86&language=pt-br&version=O16GA' }
+      ],
+      '2024': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=Home2024Retail&platform=x64&language=pt-br&version=O16GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=Home2024Retail&platform=x86&language=pt-br&version=O16GA' },
+        { label: 'Offline x32-x64', url: 'https://officecdn.microsoft.com/db/492350f6-3a01-4f97-b9c0-c7c6ddf67d60/media/pt-br/ProPlus2024Retail.img' }
+      ],
+      '2021': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudent2021Retail&platform=x64&language=pt-br&version=O16GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudent2021Retail&platform=x86&language=pt-br&version=O16GA' },
+        { label: 'Offline x32-x64', url: 'https://officecdn.microsoft.com/db/492350f6-3a01-4f97-b9c0-c7c6ddf67d60/media/pt-br/Professional2021Retail.img' }
+      ],
+      '2019': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudent2019Retail&platform=x64&language=pt-br&version=O16GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudent2019Retail&platform=x86&language=pt-br&version=O16GA' },
+        { label: 'Offline x32-x64', url: 'https://officecdn.microsoft.com/db/492350f6-3a01-4f97-b9c0-c7c6ddf67d60/media/pt-br/ProPlus2019Retail.img' }
+      ],
+      '2016': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudentRetail&platform=x64&language=pt-br&version=O16GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudentRetail&platform=x86&language=pt-br&version=O16GA' },
+        { label: 'Offline x32-x64', url: 'https://officecdn.microsoft.com/db/492350f6-3a01-4f97-b9c0-c7c6ddf67d60/media/pt-br/ProPlusRetail.img' }
+      ],
+      '2013': [
+        { label: 'Online x64', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudentRetail&platform=x64&language=pt-br&version=O15GA' },
+        { label: 'Online x32', url: 'https://c2rsetup.officeapps.live.com/c2r/download.aspx?ProductreleaseID=HomeStudentRetail&platform=x86&language=pt-br&version=O15GA' },
+        { label: 'Offline x32-x64', url: 'https://officecdn.microsoft.com/db/39168d7e-077b-48e7-872c-b232c3e72675/media/pt-br/ProfessionalRetail.img' }
+      ]
+    };
+
+    const selectedOptions = officeDownloads[version];
+    if (!selectedOptions) {
+      this.showModal('Versão de Office não encontrada.');
+      return;
+    }
+
+    this.renderOfficeVariantMenu(labelText, selectedOptions);
+  }
+
+  renderOfficeVariantMenu(versionLabel, options) {
+    const app = document.getElementById('app');
+    const optionsHtml = options
+      .map(option => `<button class="menu-item" data-office-url="${option.url}">${option.label}</button>`)
+      .join('');
+
+    app.innerHTML = `
+      <div class="screen-content">
+        <h1 class="title">MASTER NERD</h1>
+        <div class="subtitle" style="font-size: 0.8rem; margin-bottom: 5px; color: #aaa;">By Manoel Coelho</div>
+        <div class="subtitle">${versionLabel}</div>
+
+        <div class="pixel-wave">~ ~ ~ ~ ~</div>
+
+        <div class="menu-items">
+          ${optionsHtml}
+          <button class="menu-item" id="btn-voltar-office-versions">Voltar</button>
+        </div>
+
+        <div class="prompt-text">SELECT YOUR OPTION</div>
+      </div>
+    `;
+
+    document.querySelectorAll('[data-office-url]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-office-url');
+        this.startDownload(url);
+      });
+    });
+
+    document.getElementById('btn-voltar-office-versions').addEventListener('click', () => {
+      this.renderOfficeMenu();
     });
   }
 
