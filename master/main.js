@@ -212,24 +212,39 @@ ipcMain.handle('elevate-app', async () => {
     throw new Error('A elevação automática está disponível apenas no Windows');
   }
 
-  const escapeQuotes = (value) => String(value || '').replace(/"/g, '""');
-  const exePath = escapeQuotes(process.execPath);
-  const args = process.argv.slice(1).map(escapeQuotes);
-  const argList = args.length ? `@("${args.join('","')}")` : '@()';
-  const script = `
-    $argsList = ${argList};
-    Start-Process -FilePath "${exePath}" -ArgumentList $argsList -Verb RunAs
-  `;
+  // Quando o app está empacotado, precisamos usar o executável correto
+  // process.execPath pode apontar para o electron.exe dentro do ASAR
+  // Então usamos app.getPath('exe') que sempre retorna o executável principal
+  let exePath = app.getPath('exe');
+  
+  // Em desenvolvimento, usa o process.execPath
+  if (!app.isPackaged) {
+    exePath = process.execPath;
+  }
+
+  // Para o executável empacotado, usar caminho sem argumentos
+  // Argumentos podem causar problemas ao reabrir
+  const script = `Start-Process -FilePath '${exePath.replace(/'/g, "''")}' -Verb RunAs`;
+
+  console.log('Elevando aplicação com:', {
+    exePath: exePath,
+    isPackaged: app.isPackaged
+  });
 
   await new Promise((resolve, reject) => {
-    execFile('powershell.exe', ['-NoProfile', '-Command', script], { windowsHide: true }, (error) => {
+    execFile('powershell.exe', ['-NoProfile', '-Command', script], { windowsHide: true }, (error, stdout, stderr) => {
       if (error) {
+        console.error('Erro ao elevar:', error, stderr);
         reject(error);
         return;
       }
+      console.log('Comando executado:', stdout);
       resolve();
     });
   });
 
-  app.quit();
+  // Aguarda um pouco antes de fechar para garantir que o novo processo inicie
+  setTimeout(() => {
+    app.quit();
+  }, 500);
 });

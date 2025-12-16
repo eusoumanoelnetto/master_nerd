@@ -135,14 +135,14 @@ class MasterNerdApp {
     // Add click handlers for menu items
     document.querySelectorAll('.menu-item').forEach((item, i) => {
       item.addEventListener('click', () => {
-        this.selectedMenuIndex = i;
-        this.renderMenuScreen();
-        
-        // Check if it's the "Voltar" option
-        if (i === this.missions.length) {
+        // Não re-renderiza antes de executar a missão para evitar conflitos
+        this.selectedMenuIndex = Number(i);
+
+        // "Voltar" é o último item (índice igual ao tamanho de this.missions)
+        if (this.selectedMenuIndex === this.missions.length) {
           this.renderStartScreen();
         } else {
-          this.runMission(i);
+          this.runMission(this.selectedMenuIndex);
         }
       });
     });
@@ -174,22 +174,27 @@ class MasterNerdApp {
   }
 
   async runMission(index) {
-    if (index === 0) {
+    const idx = Number(index);
+
+    if (idx === 0) {
       this.renderFormatPendriveScreen();
       return;
     }
 
-    if (index === 1) {
+    if (idx === 1) {
       await this.runMicrosoftActivation();
       return;
     }
 
-    if (index === 2) {
+    if (idx === 2) {
       this.renderExtrasMenu();
       return;
     }
 
-    this.showModal(`Launching: ${this.missions[index]?.label || 'Em breve'}`);
+    // Apenas mostra modal se for realmente uma opção desconhecida
+    if (idx < 0 || idx >= this.missions.length) {
+      this.showModal('Opção desconhecida.');
+    }
   }
 
   async runMicrosoftActivation() {
@@ -630,6 +635,14 @@ class MasterNerdApp {
         this.requestElevation();
       });
     }
+
+      // Adiciona evento ao botão "Ativar modo Admin" na interface principal
+      const mainElevateBtn = document.getElementById('btn-elevate');
+      if (mainElevateBtn) {
+        mainElevateBtn.addEventListener('click', () => {
+          this.requestElevation();
+        });
+      }
 
     document.getElementById('refresh-disks').addEventListener('click', () => {
       this.updateAdminStatus().then(() => this.fetchDiskList());
@@ -1235,23 +1248,48 @@ class MasterNerdApp {
   }
 
   async requestElevation() {
+      // Verifica se já está elevado
+      if (this.isElevated) {
+        this.showModal('O aplicativo já está em modo Administrador.');
+        return;
+      }
+    
     if (!this.electronAPI?.elevateApp) {
       this.showModal('Elevação automática não suportada neste ambiente. Execute manualmente como Administrador.');
       return;
     }
 
     const statusText = document.getElementById('admin-status-text');
+      const formatStatus = document.getElementById('format-status');
+    
+      // Mostra mensagem de feedback
     if (statusText) {
-      statusText.textContent = 'Solicitando modo Administrador... o app será reiniciado se autorizado.';
+        statusText.textContent = 'Solicitando modo Administrador...';
+        statusText.classList.add('warning');
+      }
+      if (formatStatus) {
+        formatStatus.textContent = 'Aguarde... O aplicativo será reiniciado com privilégios de Administrador.';
+        formatStatus.classList.remove('error', 'success');
+        formatStatus.classList.add('warning');
     }
 
+      console.log('Iniciando elevação do aplicativo...');
+    
     try {
       await this.electronAPI.elevateApp();
+        console.log('Elevação solicitada com sucesso. O app deve fechar e reabrir.');
     } catch (err) {
       console.error('Falha ao elevar aplicativo', err);
       if (statusText) {
-        statusText.textContent = 'Não foi possível ativar o modo Admin automaticamente. Execute o app manualmente como Administrador.';
+          statusText.textContent = 'Erro: Não foi possível ativar o modo Admin.';
+          statusText.classList.add('error');
+        }
+        if (formatStatus) {
+          formatStatus.textContent = 'ERRO: Não foi possível elevar privilégios. Execute o Master.Nerd.exe como Administrador (clique direito > Executar como Administrador).';
+          formatStatus.classList.add('error');
       }
+      
+        this.showModal('Erro ao solicitar privilégios de Administrador. Por favor, feche o aplicativo e execute-o manualmente como Administrador (clique direito > Executar como Administrador).');
     }
   }
 }
