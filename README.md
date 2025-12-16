@@ -1,3 +1,5 @@
+![Master Nerd Banner](src/banner.png)
+
 # Master Nerd
 
 [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
