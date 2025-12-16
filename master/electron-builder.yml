@@ -10,7 +10,7 @@ files:
 publish: never
 
 win:
-  icon: ../src/pixel01.ico
+  icon: build/icon.ico
   target:
     - target: portable
       arch:
