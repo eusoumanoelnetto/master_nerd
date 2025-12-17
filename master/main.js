@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const { execFile } = require('child_process');
 
@@ -247,4 +247,17 @@ ipcMain.handle('elevate-app', async () => {
   setTimeout(() => {
     app.quit();
   }, 500);
+});
+
+// Abre URLs externas no navegador padrão (usado para downloads)
+ipcMain.handle('open-external', async (_event, url) => {
+  if (!url || typeof url !== 'string') {
+    throw new Error('URL inválida');
+  }
+  // Garante apenas esquemas http/https
+  const isHttp = /^https?:\/\//i.test(url);
+  if (!isHttp) {
+    throw new Error('Esquema de URL não permitido');
+  }
+  await shell.openExternal(url);
 });

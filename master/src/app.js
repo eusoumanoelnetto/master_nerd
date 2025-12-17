@@ -415,15 +415,24 @@ class MasterNerdApp {
   }
 
   startDownload(url) {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = '';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    this.showModal('Download iniciado! Verifique a pasta de Downloads do seu navegador.');
+    try {
+      if (window?.electronAPI?.openExternal) {
+        // Abre no navegador padrão via processo principal (mais confiável em app empacotado)
+        window.electronAPI.openExternal(url);
+      } else {
+        // Fallback para ambiente dev
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      this.showModal('Download iniciado! Verifique a pasta de Downloads do seu navegador.');
+    } catch (err) {
+      this.showModal('Não foi possível abrir o link de download.');
+    }
   }
 
   renderOfficeMenu() {
