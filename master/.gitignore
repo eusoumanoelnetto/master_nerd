@@ -1,2 +1,5 @@
 # Ignore dependencies installed via npm
 node_modules/
+
+# Ignore Electron build output
+dist/
